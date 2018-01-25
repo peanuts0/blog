@@ -131,6 +131,99 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="pages-jsonReader" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2018/01/25/jsonReader/">json文件导入</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2018/01/25/jsonReader/" class="archive-article-date">
+  	<time datetime="2018-01-25T05:53:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>现在有一个全国省市区数据的json文件数据要导入数据库</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>最简单的办法就是把这些json字符串放入一个String中，然后再用fastJson等类库，把String转换成对应的对象，再作其他入库处理。 这个有个问题就是String的大小容量问题</p>
+<h5 id="放-String为何不合适"><a href="#放-String为何不合适" class="headerlink" title="放 String为何不合适"></a>放 String为何不合适</h5><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/** <span class="type">The</span> <span class="keyword">value</span> is used <span class="keyword">for</span> character storage. */</span><br><span class="line">    <span class="keyword">private</span> final <span class="built_in">char</span> <span class="keyword">value</span><span class="literal">[]</span>;</span><br></pre></td></tr></table></figure>
+<p>String 的数据其实都是放在了这个final的字符数组中，那么其长度限制就是Integer.MAX_VALUE 也就是2^31 - 1 = 2147483647 。那么如果这个vaue[]<br>占满了，要耗费多少内存呢？</p>
+<p>这个我们插入一个知识点：</p>
+<blockquote>
+<p>字节：byte<br>    位：bit<br>    字符：char<br>    一个字节占8位，也就是1 byte = 8 bit<br>    一个字符占16位，也就是1 char = 16 bit = 2 byte<br>    1KB = 1024 byte<br>    1MB = 1024 KB<br>    1GB = 1024 MB<br>    1TB = 1024 GB</p>
+</blockquote>
+<p>回到上述value[] 的大小是可以存放2147483647个char 也就是2147483647 * 2 = 4294967294 byte，也就是<br>4294967294 / 1024 / 1024 /1024 约= 4 G。</p>
+<p>上述的国家地区数据不会有4G，那为何不放呢？ 其原因是因为java在编译期会有个优化，将一些常量的字符提前处理，优化编译。例如下述代码：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String [] args)</span> </span>&#123;</span><br><span class="line">        String str = <span class="string">"2343423"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用命令 <code>javap -verbose Demo.class</code>  查看</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"></span><br><span class="line">Constant pool:</span><br><span class="line"><span class="meta">   #</span><span class="bash">1 = Methodref          <span class="comment">#4.#20         // java/lang/Object."&lt;init&gt;":()V</span></span></span><br><span class="line"><span class="meta">   #</span><span class="bash">2 = String             <span class="comment">#21            // 2343423</span></span></span><br><span class="line"><span class="meta">   #</span><span class="bash">3 = Class              <span class="comment">#22            // com/qiho/web/Demo</span></span></span><br><span class="line"><span class="meta">   #</span><span class="bash">4 = Class              <span class="comment">#23            // java/lang/Object</span></span></span><br><span class="line"><span class="meta">   #</span><span class="bash">5 = Utf8               &lt;init&gt;</span></span><br><span class="line"><span class="meta">   #</span><span class="bash">6 = Utf8               ()V</span></span><br><span class="line"><span class="meta">   #</span><span class="bash">7 = Utf8               Code</span></span><br><span class="line"><span class="meta">   #</span><span class="bash">8 = Utf8               LineNumberTable</span></span><br><span class="line"><span class="meta">   #</span><span class="bash">9 = Utf8               LocalVariableTable</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">10 = Utf8               this</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">11 = Utf8               Lcom/qiho/web/Demo;</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">12 = Utf8               main</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">13 = Utf8               ([Ljava/lang/String;)V</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">14 = Utf8               args</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">15 = Utf8               [Ljava/lang/String;</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">16 = Utf8               str</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">17 = Utf8               Ljava/lang/String;</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">18 = Utf8               SourceFile</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">19 = Utf8               Demo.java</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">20 = NameAndType        <span class="comment">#5:#6          // "&lt;init&gt;":()V</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash">21 = Utf8               2343423</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">22 = Utf8               com/qiho/web/Demo</span></span><br><span class="line"><span class="meta">  #</span><span class="bash">23 = Utf8               java/lang/Object</span></span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+<p>可以看到常量池为的 <code>#2 = String             #21</code> 和 <code>#21 = Utf8               2343423</code> 已经提前优化好了。</p>
+<p>显然如果这个里有4G的数据那对jvm来说绝对是个灾难。常量字符串在class格式文件中的存储格式：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">CONSTANT_Utf8_info</span> &#123;</span><br><span class="line">   <span class="attribute">u1</span> tag;</span><br><span class="line">   <span class="attribute">u2</span> length;</span><br><span class="line">   <span class="attribute">u1</span> bytes[length];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>u2是无符号的16位整数，因此理论上允许的string 常量的最大长度是2^16  -1 = 65535。所以大数据量的字符串并不能放入常量String中。</p>
+<h3 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h3><p>其实解决这个也很简单，即然它是个json的大文件数据，那就按照文件的方式来处理就好了。即将这个文件读入内存，再行解析。这里再扯一下，如果是个超大文件的话，可以偿试用堆外内存去处理，这里就不展开了，有兴趣的可以自行google。</p>
+<p>FastJson 有个 JSONReader 可以处理文件，再根据 TypeReference 转换为相应的 list, 代码如下：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">File</span> <span class="keyword">file</span> = <span class="keyword">new</span> <span class="keyword">File</span>(filePath);</span><br><span class="line">        </span><br><span class="line">JSONReader reader = <span class="keyword">new</span> JSONReader(<span class="keyword">new</span> FileReader(<span class="keyword">file</span>));</span><br><span class="line">   </span><br><span class="line">List&lt;Region&gt; regionList = reader.readObject(<span class="keyword">new</span> TypeReference&lt;List&lt;Region&gt;&gt;()&#123;&#125;);</span><br><span class="line">   </span><br><span class="line"><span class="comment">//do some business</span></span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2018/01/25/jsonReader/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-15166108339904" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -411,6 +504,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
             <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
           </label>
           <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color5">Java</a>
+              </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
