@@ -15,7 +15,7 @@
 <meta property="og:url" content="/peanuts0.github.io/2018/01/25/jsonReader/index.html">
 <meta property="og:site_name" content="花生的博客">
 <meta property="og:description" content="背景现在有一个全国省市区数据的json文件数据要导入数据库 思路最简单的办法就是把这些json字符串放入一个String中，然后再用fastJson等类库，把String转换成对应的对象，再作其他入库处理。 这个有个问题就是String的大小容量问题 放 String为何不合适12/** The value is used for character storage. */    private">
-<meta property="og:updated_time" content="2018-01-25T07:24:36.000Z">
+<meta property="og:updated_time" content="2018-01-25T07:35:01.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="json文件导入">
 <meta name="twitter:description" content="背景现在有一个全国省市区数据的json文件数据要导入数据库 思路最简单的办法就是把这些json字符串放入一个String中，然后再用fastJson等类库，把String转换成对应的对象，再作其他入库处理。 这个有个问题就是String的大小容量问题 放 String为何不合适12/** The value is used for character storage. */    private">
@@ -158,6 +158,7 @@
 <blockquote>
 <p>字节：byte<br>    位：bit<br>    字符：char<br>    一个字节占8位，也就是1 byte = 8 bit<br>    一个字符占16位，也就是1 char = 16 bit = 2 byte<br>    1KB = 1024 byte<br>    1MB = 1024 KB<br>    1GB = 1024 MB<br>    1TB = 1024 GB</p>
 </blockquote>
+<a id="more"></a>
 <p>回到上述value[] 的大小是可以存放2147483647个char 也就是2147483647 * 2 = 4294967294 byte，也就是<br>4294967294 / 1024 / 1024 /1024 约= 4 G。</p>
 <p>上述的国家地区数据不会有4G，那为何不放呢？ 其原因是因为java在编译期会有个优化，将一些常量的字符提前处理，优化编译。例如下述代码：</p>
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Demo</span> &#123;</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String [] args)</span> </span>&#123;</span><br><span class="line">        String str = <span class="string">"2343423"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -407,15 +408,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">linux</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">命令</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">工具</a>
               </li>
             
             <div class="clearfix"></div>
