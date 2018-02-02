@@ -6,18 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>Tag: 工具 | 花生的博客</title>
+  <title>CountDownLatch 详解 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="坐标杭州，二流程序员">
-<meta name="keywords" content="后端，linux，java，spring，分布式，python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="花生的博客">
-<meta property="og:url" content="//peanuts0.github.io/tags/工具/index.html">
+  <meta name="description" content="介绍CountDownLatch 是JUC下的一个类，它可用于解决这种场景：有个线程A必须要等待其他线程都执行完成后，线程A才能执行它的任务。">
+<meta name="keywords" content="Java,多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CountDownLatch 详解">
+<meta property="og:url" content="//peanuts0.github.io/2018/02/02/countdownlatch/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="坐标杭州，二流程序员">
+<meta property="og:description" content="介绍CountDownLatch 是JUC下的一个类，它可用于解决这种场景：有个线程A必须要等待其他线程都执行完成后，线程A才能执行它的任务。">
+<meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/java.jpg">
+<meta property="og:updated_time" content="2018-02-02T11:28:10.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="花生的博客">
-<meta name="twitter:description" content="坐标杭州，二流程序员">
+<meta name="twitter:title" content="CountDownLatch 详解">
+<meta name="twitter:description" content="介绍CountDownLatch 是JUC下的一个类，它可用于解决这种场景：有个线程A必须要等待其他线程都执行完成后，线程A才能执行它的任务。">
+<meta name="twitter:image" content="http://p33uh193a.bkt.clouddn.com/java.jpg">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -129,60 +132,209 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="pages-countdownlatch" class="article article-type-pages " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/blog/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/01/22/15165864139104/" class="archive-article-date">
-  	<time datetime="2018-01-22T02:00:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/01/22/15165864139104/">btrace 初使用</a>
+    <h1 class="article-title" itemprop="name">
+      CountDownLatch 详解
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/blog/2018/02/02/countdownlatch/" class="archive-article-date">
+  	<time datetime="2018-02-02T06:09:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-02</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://p33uh193a.bkt.clouddn.com/java.jpg" alt=""></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>CountDownLatch 是JUC下的一个类，它可用于解决这种场景：有个线程A必须要等待其他线程都执行完成后，线程A才能执行它的任务。</p>
+<a id="more"></a>
+<p>我们看个例子：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CountDownLatchDemo</span> &#123;</span><br><span class="line">    <span class="comment">//初始化10个任务线程</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> CountDownLatch latch = <span class="keyword">new</span> CountDownLatch(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>) throws InterruptedException </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//线程工厂</span></span><br><span class="line">        ThreadFactory threadFactory = <span class="keyword">new</span> ThreadFactoryBuilder().setNameFormat(<span class="string">"count down thread %d"</span>).build();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//线程池</span></span><br><span class="line">        ExecutorService executorService = <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">10</span>, <span class="number">10</span>,</span><br><span class="line">                                                        <span class="number">0</span>, TimeUnit.MICROSECONDS,</span><br><span class="line">                                                                <span class="keyword">new</span> ArrayBlockingQueue&lt;&gt;(<span class="number">10</span>),</span><br><span class="line">                                                                threadFactory,</span><br><span class="line">                                                                <span class="keyword">new</span> ThreadPoolExecutor.AbortPolicy());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> k = <span class="number">0</span>; k&lt; <span class="number">10</span>;k++) &#123;</span><br><span class="line">            executorService.execute(<span class="keyword">new</span> CountDownThread());</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"等待线程执行完了..."</span>);</span><br><span class="line">        latch.<span class="keyword">await</span>();</span><br><span class="line"></span><br><span class="line">        System.<span class="keyword">out</span>.println(<span class="string">"所有线程执行完了!"</span>);</span><br><span class="line"></span><br><span class="line">        executorService.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">CountDownThread</span> <span class="title">implements</span> <span class="title">Runnable</span>&#123;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//睡眠1秒</span></span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                TimeUnit.SECONDS.sleep(<span class="number">1</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            System.<span class="keyword">out</span>.println(Thread.currentThread().getName() + <span class="string">" 执行完了"</span>);</span><br><span class="line">            <span class="comment">//通知 CountDownLatch 执行完成</span></span><br><span class="line">            latch.countDown();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果</p>
+<blockquote>
+<p>等待线程执行完了…<br>count down thread 0 执行完了<br>count down thread 4 执行完了<br>count down thread 2 执行完了<br>count down thread 3 执行完了<br>count down thread 1 执行完了<br>count down thread 5 执行完了<br>count down thread 6 执行完了<br>count down thread 7 执行完了<br>count down thread 8 执行完了<br>count down thread 9 执行完了<br>所有线程执行完了!</p>
+</blockquote>
+<p>CountDownLatch的使用主要就两个方法:等待调用 <code>await()</code> 或者加了超时的等待，线程完成调用 <code>countDown()</code>。例子很简单也很好理解，那么它是如果实现呢？</p>
+<h2 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h2><p>查看它的源码，发现它有个继承了AbstractQueuedSynchronizer的Sync内部类，AbstractQueuedSynchronizer简称AQS，是JUC的核心组件，基于AQS实现了ReentrantLock，Semaphore等一系列的并发组件，详情可以参考 <a href="http://ifeve.com/introduce-abstractqueuedsynchronizer/" target="_blank" rel="noopener">AbstractQueuedSynchronizer的介绍和原理分析</a></p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">Sync</span> <span class="keyword">extends</span> <span class="title">AbstractQueuedSynchronizer</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">4982264981922014374</span>L;</span><br><span class="line"></span><br><span class="line">        Sync(<span class="keyword">int</span> count) &#123;</span><br><span class="line">            setState(count);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">int</span> <span class="title">getCount</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="function"><span class="keyword">return</span> <span class="title">getState</span><span class="params">()</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">protected</span> <span class="function"><span class="keyword">int</span> <span class="title">tryAcquireShared</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> (getState() == <span class="number">0</span>) ? <span class="number">1</span> : -1;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">protected</span> <span class="function"><span class="keyword">boolean</span> <span class="title">tryReleaseShared</span><span class="params">(<span class="keyword">int</span> releases)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// Decrement count; signal when transition to zero</span></span><br><span class="line">            <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                <span class="keyword">int</span> c = getState();</span><br><span class="line">                <span class="keyword">if</span> (c == <span class="number">0</span>)</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">int</span> nextc = c<span class="number">-1</span>;</span><br><span class="line">                <span class="keyword">if</span> (compareAndSetState(c, nextc))</span><br><span class="line">                    <span class="keyword">return</span> nextc == <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Sync sync;</span><br></pre></td></tr></table></figure>
+<figure class="highlight axapta"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> CountDownLatch(<span class="keyword">int</span> <span class="keyword">count</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">count</span> &lt; <span class="number">0</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(<span class="string">"count &lt; 0"</span>);</span><br><span class="line">        <span class="keyword">this</span>.sync = <span class="keyword">new</span> Sync(<span class="keyword">count</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>在new CountDownLatch 时初始化AQS，并设置AQS的同步状态值为count。当我们调用await时又发生了什么了？</p>
+<h2 id="await"><a href="#await" class="headerlink" title="await"></a>await</h2><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">await</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">        sync.acquireSharedInterruptibly(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>调用了sync.acquireSharedInterruptibly</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">void</span> acquireSharedInterruptibly(<span class="keyword">int</span> arg)</span><br><span class="line">            <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">        <span class="keyword">if</span> (Thread.interrupted())</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InterruptedException();</span><br><span class="line">        <span class="keyword">if</span> (tryAcquireShared(arg) &lt; <span class="number">0</span>)</span><br><span class="line">            doAcquireSharedInterruptibly(arg);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>再调用 tryAcquireShared</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">int</span> <span class="title">tryAcquireShared</span><span class="params">(<span class="keyword">int</span> acquires)</span> </span>&#123;</span><br><span class="line">           <span class="keyword">return</span> (getState() == <span class="number">0</span>) ? <span class="number">1</span> : <span class="number">-1</span>;</span><br><span class="line">       &#125;</span><br></pre></td></tr></table></figure>
+<p>判断当前AQS的线程状态值是否为0,为0返回1，不为0返回-1。如果这里返回了1，上面的<code>if (tryAcquireShared(arg) &lt; 0)</code> 将不成立，await()方法也就调用完成了，否则返回-1，执行下面的<code>doAcquireSharedInterruptibly</code>。也就是说当<code>getState</code><strong>返回0时就说明当前所有线程都执行完了，没有线程在阻塞，</strong> 否则进入 <code>doAcquireSharedInterruptibly</code> 的阻塞方法。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">private void doAcquireSharedInterruptibly(int arg)</span><br><span class="line">        throws InterruptedException &#123;</span><br><span class="line">        //a、创建共享节点，加入阻塞队列尾部</span><br><span class="line">        final <span class="keyword">Node</span> <span class="title">node</span> = addWaiter(<span class="keyword">Node</span>.<span class="title">SHARED</span>);</span><br><span class="line">        boolean failed = <span class="literal">true</span>;</span><br><span class="line">        try &#123;</span><br><span class="line">        //b、循环检测当前线程节点</span><br><span class="line">            for (;;) &#123;</span><br><span class="line">                final <span class="keyword">Node</span> <span class="title">p</span> = <span class="keyword">node</span>.<span class="title">predecessor</span>();</span><br><span class="line">                if (p == head) &#123;</span><br><span class="line">                    int r = tryAcquireShared(arg);</span><br><span class="line">                    if (r &gt;= <span class="number">0</span>) &#123;</span><br><span class="line">                        setHeadAndPropagate(<span class="keyword">node</span><span class="title">, r</span>);</span><br><span class="line">                        p.next = null; // help GC</span><br><span class="line">                        failed = <span class="literal">false</span>;</span><br><span class="line">                        return;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                if (shouldParkAfterFailedAcquire(p, <span class="keyword">node</span><span class="title">) &amp;&amp;</span></span><br><span class="line"><span class="title">                    parkAndCheckInterrupt</span>())</span><br><span class="line">                    throw new InterruptedException();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">            if (failed)</span><br><span class="line">                cancelAcquire(<span class="keyword">node</span><span class="title">);</span></span><br><span class="line"><span class="title">        &#125;</span></span><br><span class="line"><span class="title">    &#125;</span></span><br></pre></td></tr></table></figure>
+<p>首先操作a创建了一个共享模式的节点并加入到阻塞队列。</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">private <span class="keyword">Node</span> <span class="title">addWaiter</span>(<span class="keyword">Node</span> <span class="title">mode</span>) &#123;</span><br><span class="line">       <span class="keyword">Node</span> <span class="title">node</span> = new <span class="keyword">Node</span><span class="title">(Thread</span>.currentThread(), mode);</span><br><span class="line">       // Try the fast path of enq; backup to full enq on failure</span><br><span class="line">       <span class="keyword">Node</span> <span class="title">pred</span> = tail;</span><br><span class="line">       if (pred != null) &#123;</span><br><span class="line">           <span class="keyword">node</span>.<span class="title">prev</span> = pred;</span><br><span class="line">           if (compareAndSetTail(pred, <span class="keyword">node</span><span class="title">)) &#123;</span></span><br><span class="line"><span class="title">               pred</span>.next = <span class="keyword">node</span><span class="title">;</span></span><br><span class="line"><span class="title">               return</span> <span class="keyword">node</span><span class="title">;</span></span><br><span class="line"><span class="title">           &#125;</span></span><br><span class="line"><span class="title">       &#125;</span></span><br><span class="line"><span class="title">       enq</span>(<span class="keyword">node</span><span class="title">);</span></span><br><span class="line"><span class="title">       return</span> <span class="keyword">node</span><span class="title">;</span></span><br><span class="line"><span class="title">   &#125;</span></span><br><span class="line"><span class="title">   </span></span><br><span class="line"><span class="title">   private</span> <span class="keyword">Node</span> <span class="title">enq</span>(final <span class="keyword">Node</span> <span class="title">node</span>) &#123;</span><br><span class="line">       for (;;) &#123;</span><br><span class="line">           <span class="keyword">Node</span> <span class="title">t</span> = tail;</span><br><span class="line">           if (t == null) &#123; // Must initialize</span><br><span class="line">               if (compareAndSetHead(new <span class="keyword">Node</span><span class="title">()))</span></span><br><span class="line"><span class="title">                   tail</span> = head;</span><br><span class="line">           &#125; else &#123;</span><br><span class="line">               <span class="keyword">node</span>.<span class="title">prev</span> = t;</span><br><span class="line">               if (compareAndSetTail(t, <span class="keyword">node</span><span class="title">)) &#123;</span></span><br><span class="line"><span class="title">                   t</span>.next = <span class="keyword">node</span><span class="title">;</span></span><br><span class="line"><span class="title">                   return</span> t;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>首先创建当前线程且为共享模式的节点</li>
+<li>列尾不为空时，cas判断当前队尾是否有变化，无变化把创建节点放入至队尾，有变化if结束执行enq</li>
+<li>enq是个死循环，通过cas把当前线程节点加入阻塞队列</li>
+</ul>
+<p>好了，现在调用了await方法的线程已经被作为节点放入了cas的阻塞队列之中。然后开启操作b循环处理。判断当前节点的父节点是否是头节点，如果是头节点，调用<code>tryAcquireShared(1)</code> 查看AQS的线程状态值是否为0即线程是否都执行完，如果执行完了就设置当前线程节点为头节点，结束等待。否则更新当前线程状态并进入下个循环。</p>
+<h2 id="countDown"><a href="#countDown" class="headerlink" title="countDown"></a>countDown</h2><figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">void</span> <span class="title">countDown</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    sync.releaseShared(<span class="number">1</span>);</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="function"><span class="keyword">boolean</span> <span class="title">releaseShared</span><span class="params">(<span class="keyword">int</span> arg)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">if</span> (tryReleaseShared(arg)) &#123;</span><br><span class="line">       doReleaseShared();</span><br><span class="line">       <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">boolean</span> <span class="title">tryReleaseShared</span><span class="params">(<span class="keyword">int</span> releases)</span> </span>&#123;</span><br><span class="line">            <span class="comment">// Decrement count; signal when transition to zero</span></span><br><span class="line">            <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">                <span class="keyword">int</span> c = getState();</span><br><span class="line">                <span class="keyword">if</span> (c == <span class="number">0</span>)</span><br><span class="line">                    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">                <span class="keyword">int</span> nextc = c<span class="number">-1</span>;</span><br><span class="line">                <span class="keyword">if</span> (compareAndSetState(c, nextc))</span><br><span class="line">                    <span class="keyword">return</span> nextc == <span class="number">0</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">private</span> <span class="function"><span class="keyword">void</span> <span class="title">doReleaseShared</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">/*</span></span><br><span class="line"><span class="comment">         * Ensure that a release propagates, even if there are other</span></span><br><span class="line"><span class="comment">         * in-progress acquires/releases.  This proceeds in the usual</span></span><br><span class="line"><span class="comment">         * way of trying to unparkSuccessor of head if it needs</span></span><br><span class="line"><span class="comment">         * signal. But if it does not, status is set to PROPAGATE to</span></span><br><span class="line"><span class="comment">         * ensure that upon release, propagation continues.</span></span><br><span class="line"><span class="comment">         * Additionally, we must loop in case a new node is added</span></span><br><span class="line"><span class="comment">         * while we are doing this. Also, unlike other uses of</span></span><br><span class="line"><span class="comment">         * unparkSuccessor, we need to know if CAS to reset status</span></span><br><span class="line"><span class="comment">         * fails, if so rechecking.</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            Node h = head;</span><br><span class="line">            <span class="keyword">if</span> (h != <span class="keyword">null</span> &amp;&amp; h != tail) &#123;</span><br><span class="line">                <span class="keyword">int</span> ws = h.waitStatus;</span><br><span class="line">                <span class="keyword">if</span> (ws == Node.SIGNAL) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (!compareAndSetWaitStatus(h, Node.SIGNAL, <span class="number">0</span>))</span><br><span class="line">                        <span class="keyword">continue</span>;            <span class="comment">// loop to recheck cases</span></span><br><span class="line">                    unparkSuccessor(h);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (ws == <span class="number">0</span> &amp;&amp;</span><br><span class="line">                         !compareAndSetWaitStatus(h, <span class="number">0</span>, Node.PROPAGATE))</span><br><span class="line">                    <span class="keyword">continue</span>;                <span class="comment">// loop on failed CAS</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (h == head)                   <span class="comment">// loop if head changed</span></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>tryReleaseShared 也是个循环处理</p>
+<ul>
+<li>获取state如果为0，直接返回false</li>
+<li>state - 1 表明减少一个线程，并cas更新原state，判断当前减1后的状态值 是否为0</li>
+<li>doReleaseShared 唤起后续节点</li>
+</ul>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
+<li>CountDownLatch适用于某个线程A等待其他线程执行完成后再执行A任务的场景</li>
+<li>CountDownLatch new时必须确定具体的线程个数count。</li>
+<li>如果count小于线程数，在count个countDown时唤起await。如果count 大于线程数，多出来的线程将一直await。</li>
+<li>CountDownLatch的原理是通过AQS的实现。new的线程个数即为AQS state值，AQS Node为共享节点。</li>
+<li>调用await时把当前线程节点加入AQS阻塞队列</li>
+<li>调用countDown时 AQS state减1，唤起阻塞队列中的节点。所有线程countDown，state 为0，await自旋结束。</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">工具</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/02/02/countdownlatch/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
   
   
-    </div></section>
+    <a href="/blog/2018/02/01/线程状态流转/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">java线程状态流转</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+  
+  
   
 
-    
+  
+
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '{{page.articleID}}',
+  owner: 'peanuts0',
+  repo: 'blog',
+  oauth: {
+    client_id: '17716911d1143cda96e6',
+    client_secret: '9be9112ba195381de296db28a6eda05903c65d16',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -205,9 +357,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
