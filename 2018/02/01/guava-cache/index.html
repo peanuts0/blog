@@ -5,14 +5,14 @@
   
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
-  <link rel="dns-prefetch" href="/peanuts0.github.io">
+  <link rel="dns-prefetch" href="//peanuts0.github.io">
   <title>guava cache refreshAfterWrite | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
 <meta name="keywords" content="Java,Guava">
 <meta property="og:type" content="article">
 <meta property="og:title" content="guava cache refreshAfterWrite">
-<meta property="og:url" content="/peanuts0.github.io/2018/02/01/guava-cache/index.html">
+<meta property="og:url" content="//peanuts0.github.io/2018/02/01/guava-cache/index.html">
 <meta property="og:site_name" content="花生的博客">
 <meta property="og:description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
 <meta property="og:updated_time" content="2018-02-02T02:26:04.000Z">
@@ -262,7 +262,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http:/peanuts0.github.io/2018/02/01/guava-cache/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/02/01/guava-cache/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -326,8 +326,9 @@
 <script src="//imsun.github.io/gitment/dist/gitment.browser.js"></script>
 <script>
 var gitment = new Gitment({
+  id: "//peanuts0.github.io/blog/2018/02/01/guava-cache/",
   owner: '‘peanuts0’',
-  repo: 'blog',
+  repo: 'peanuts0.github.io/blog',
   oauth: {
     client_id: '5dc7619905873785961a',
     client_secret: 'bb5afc3ed885b3295a85e89a006d84eb45eb28ca',
