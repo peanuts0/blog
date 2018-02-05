@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>CyclicBarrier | 花生的博客</title>
+  <title>CyclicBarrier 详解 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="介绍CyclicBarrier 栅栏，可以为一组线程提供了一道屏障，当这组线程中的线程达到某个点（调用 await）后线程将进入等待，直至这组线程中的所有线程都达到这个点（都调用了await）,所有线程被唤醒继续处理。而且CyclicBarrier 还提供了reset方法使得栅栏可以重复利用。比如计算统计出现问题，我们reset，然后再计算一次。想像一下赛跑的场景：得各个运动员都准备好了，才能起">
 <meta name="keywords" content="Java,多线程">
 <meta property="og:type" content="article">
-<meta property="og:title" content="CyclicBarrier">
+<meta property="og:title" content="CyclicBarrier 详解">
 <meta property="og:url" content="//peanuts0.github.io/2018/02/05/CyclicBarrier/index.html">
 <meta property="og:site_name" content="花生的博客">
 <meta property="og:description" content="介绍CyclicBarrier 栅栏，可以为一组线程提供了一道屏障，当这组线程中的线程达到某个点（调用 await）后线程将进入等待，直至这组线程中的所有线程都达到这个点（都调用了await）,所有线程被唤醒继续处理。而且CyclicBarrier 还提供了reset方法使得栅栏可以重复利用。比如计算统计出现问题，我们reset，然后再计算一次。想像一下赛跑的场景：得各个运动员都准备好了，才能起">
 <meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/WechatIMG25752.png">
-<meta property="og:updated_time" content="2018-02-05T12:46:26.000Z">
+<meta property="og:updated_time" content="2018-02-05T12:47:07.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="CyclicBarrier">
+<meta name="twitter:title" content="CyclicBarrier 详解">
 <meta name="twitter:description" content="介绍CyclicBarrier 栅栏，可以为一组线程提供了一道屏障，当这组线程中的线程达到某个点（调用 await）后线程将进入等待，直至这组线程中的所有线程都达到这个点（都调用了await）,所有线程被唤醒继续处理。而且CyclicBarrier 还提供了reset方法使得栅栏可以重复利用。比如计算统计出现问题，我们reset，然后再计算一次。想像一下赛跑的场景：得各个运动员都准备好了，才能起">
 <meta name="twitter:image" content="http://p33uh193a.bkt.clouddn.com/WechatIMG25752.png">
   
@@ -139,7 +139,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      CyclicBarrier
+      CyclicBarrier 详解
     </h1>
   
 
@@ -408,11 +408,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Java</a>
+                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">命令</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -420,11 +420,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
+                <a href="javascript:void(0)" class="js-tag color5">Java</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">命令</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
