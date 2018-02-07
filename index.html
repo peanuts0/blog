@@ -219,84 +219,6 @@
 
 
   
-    <article id="pages-Phaser" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/02/06/Phaser/">Phaser 详解</a>
-    </h1>
-  
-
-        
-        <a href="/blog/2018/02/06/Phaser/" class="archive-article-date">
-  	<time datetime="2018-02-06T03:14:18.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-06</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>Phaser 是jdk 7时新增的JUC类，其功能类似于CyclicBarrier和CountDownLatch，但是Phaser 提供了更灵活的使用.</p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/02/06/Phaser/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
     <article id="pages-CyclicBarrier" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -815,10 +737,92 @@
 
 
   
+    <article id="post-15165864139104" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
-    <nav id="page-nav">
-      <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="extend next" rel="next" href="/blog/page/2/">Next &raquo;</a>
-    </nav>
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2018/01/22/15165864139104/">btrace 初使用</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2018/01/22/15165864139104/" class="archive-article-date">
+  	<time datetime="2018-01-22T02:00:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="media/15165864139104/15166718966733.jpg" alt=""></p>
+<p>btrace 是一种线上代码诊断工具。有时候线上出现的问题无法在测试环境中重现，而这些未知的问题可以通过方法调用的参数来确定，这时就可以使用btrace来定位方法的入参等一些信息。<a href="https://github.com/btraceio/btrace" target="_blank" rel="noopener">btrace github</a> 下载zip解压即可用。</p>
+<p><img src="media/15165864139104/15166093373737.jpg" alt=""></p>
+<p>编写btrace 脚本代码，例如：</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.annotations</span><span class="selector-class">.BTrace</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.annotations</span><span class="selector-class">.OnMethod</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">static</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.BTraceUtils</span><span class="selector-class">.println</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author peanut.huang</span></span><br><span class="line"><span class="comment"> * @date 2018/1/22.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">@<span class="keyword">BTrace</span></span><br><span class="line"><span class="keyword">public</span> class DetailDemo &#123;</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">OnMethod</span>(<span class="keyword">clazz</span>="<span class="keyword">com</span>.<span class="keyword">qiho</span>.<span class="keyword">web</span>.<span class="keyword">deploy</span>.<span class="keyword">controller</span>.<span class="keyword">ItemDetailsController</span>", method=<span class="string">"detail"</span>)</span><br><span class="line">    public static void detail(Long id, Long skinId, String a_cid) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">id</span>);</span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">skinId</span>);</span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">a_cid</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="media/15165864139104/15166102883966.jpg" alt=""><br>执行：</p>
+<ol>
+<li>找到当前应用进程号</li>
+<li>执行脚本<br>因为我本机已经把btrace 命令加入了环境变量可以直接执行， <code>btrace pid 脚本类</code>。当页面访问时即可以控制台打印出对应的参数<br><img src="media/15165864139104/15166104855411.jpg" alt=""></li>
+</ol>
+<p>现在我们知道了，ItemDetailsController的detail方法发生了调用，入参id=81,skinId=1</p>
+<p>或者将结果输出至文件内：<br><code>[admin@test-baiqi bin]$ ./btrace 963 ../scripts/DetailDemo.java &gt; ../scripts/logs/result.log</code></p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>江南白衣大神的<a href="http://calvin1978.blogcn.com/articles/btrace1.html" target="_blank" rel="noopener">Btrace入门到熟练小工完全指南</a></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">工具</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2018/01/22/15165864139104/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
   
 
 
@@ -904,6 +908,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
@@ -917,10 +925,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">工具</a>
               </li>
              
               <li class="article-tag-list-item">
