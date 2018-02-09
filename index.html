@@ -131,6 +131,79 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="pages-jmm" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2018/02/08/jmm/">Java 内存相关总结</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2018/02/08/jmm/" class="archive-article-date">
+  	<time datetime="2018-02-08T02:38:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-08</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h2><p>JMM (java memory model) java 内存模型。在java的世界里一切对象都运行在虚拟机中，对于有不同特征的数据，在虚拟机中会开辟不同的内存区域，大致上有以下几种：</p>
+<ul>
+<li>虚拟机栈</li>
+<li>本地方法栈</li>
+<li>元空间（jdk8以前是方法区）</li>
+<li>堆</li>
+<li>程序计数器 </li>
+</ul>
+<p>程序计数器是存储的是程序（线程）在执行时所需要的字节码指令。本地方法栈是执行一些native方法所需要的栈空间。虚拟机栈就是我们通常所说的线程隔离的”线程栈“，它描述的是java线程中方法调用的内存模型，每一个方法的调用都会创建一个栈帧，栈帧中存放了方法的局部变量表，操作栈，方法出口等，方法的调用是栈帧入栈到出栈的过程，虚拟机栈与程序计数器都是线程隔离的。在jdk8以后把方法区改成了元空间，该区域是用于存放类信息，静态变量，常量和一些即时编译后的数据。而堆就是我们应用日常对象实例数据存放的地方了。</p>
+        
+          <a class="article-more-a" href="/blog/2018/02/08/jmm/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2018/02/08/jmm/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="pages-cas" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -737,92 +810,10 @@
 
 
   
-    <article id="post-15165864139104" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/01/22/15165864139104/">btrace 初使用</a>
-    </h1>
-  
-
-        
-        <a href="/blog/2018/01/22/15165864139104/" class="archive-article-date">
-  	<time datetime="2018-01-22T02:00:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="media/15165864139104/15166718966733.jpg" alt=""></p>
-<p>btrace 是一种线上代码诊断工具。有时候线上出现的问题无法在测试环境中重现，而这些未知的问题可以通过方法调用的参数来确定，这时就可以使用btrace来定位方法的入参等一些信息。<a href="https://github.com/btraceio/btrace" target="_blank" rel="noopener">btrace github</a> 下载zip解压即可用。</p>
-<p><img src="media/15165864139104/15166093373737.jpg" alt=""></p>
-<p>编写btrace 脚本代码，例如：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.annotations</span><span class="selector-class">.BTrace</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.annotations</span><span class="selector-class">.OnMethod</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">static</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.BTraceUtils</span><span class="selector-class">.println</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author peanut.huang</span></span><br><span class="line"><span class="comment"> * @date 2018/1/22.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">@<span class="keyword">BTrace</span></span><br><span class="line"><span class="keyword">public</span> class DetailDemo &#123;</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">OnMethod</span>(<span class="keyword">clazz</span>="<span class="keyword">com</span>.<span class="keyword">qiho</span>.<span class="keyword">web</span>.<span class="keyword">deploy</span>.<span class="keyword">controller</span>.<span class="keyword">ItemDetailsController</span>", method=<span class="string">"detail"</span>)</span><br><span class="line">    public static void detail(Long id, Long skinId, String a_cid) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">id</span>);</span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">skinId</span>);</span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">a_cid</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><img src="media/15165864139104/15166102883966.jpg" alt=""><br>执行：</p>
-<ol>
-<li>找到当前应用进程号</li>
-<li>执行脚本<br>因为我本机已经把btrace 命令加入了环境变量可以直接执行， <code>btrace pid 脚本类</code>。当页面访问时即可以控制台打印出对应的参数<br><img src="media/15165864139104/15166104855411.jpg" alt=""></li>
-</ol>
-<p>现在我们知道了，ItemDetailsController的detail方法发生了调用，入参id=81,skinId=1</p>
-<p>或者将结果输出至文件内：<br><code>[admin@test-baiqi bin]$ ./btrace 963 ../scripts/DetailDemo.java &gt; ../scripts/logs/result.log</code></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>江南白衣大神的<a href="http://calvin1978.blogcn.com/articles/btrace1.html" target="_blank" rel="noopener">Btrace入门到熟练小工完全指南</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">工具</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/01/22/15165864139104/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
+    <nav id="page-nav">
+      <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="extend next" rel="next" href="/blog/page/2/">Next &raquo;</a>
+    </nav>
   
 
 
@@ -908,6 +899,14 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">命令</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">工具</a>
               </li>
              
@@ -921,14 +920,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Guava</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">命令</a>
               </li>
             
             <div class="clearfix"></div>

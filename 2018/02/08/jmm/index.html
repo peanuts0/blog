@@ -6,19 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>guava cache refreshAfterWrite | 花生的博客</title>
+  <title>Java 内存相关总结 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
-<meta name="keywords" content="Java,Guava">
+  <meta name="description" content="JMMJMM (java memory model) java 内存模型。在java的世界里一切对象都运行在虚拟机中，对于有不同特征的数据，在虚拟机中会开辟不同的内存区域，大致上有以下几种：  虚拟机栈 本地方法栈 元空间（jdk8以前是方法区） 堆 程序计数器   程序计数器是存储的是程序（线程）在执行时所需要的字节码指令。本地方法栈是执行一些native方法所需要的栈空间。虚拟机栈就是我们通常">
+<meta name="keywords" content="后端，linux，java，spring，分布式，python">
 <meta property="og:type" content="article">
-<meta property="og:title" content="guava cache refreshAfterWrite">
-<meta property="og:url" content="//peanuts0.github.io/2018/02/01/guava-cache/index.html">
+<meta property="og:title" content="Java 内存相关总结">
+<meta property="og:url" content="//peanuts0.github.io/2018/02/08/jmm/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
-<meta property="og:updated_time" content="2018-02-02T02:26:04.000Z">
+<meta property="og:description" content="JMMJMM (java memory model) java 内存模型。在java的世界里一切对象都运行在虚拟机中，对于有不同特征的数据，在虚拟机中会开辟不同的内存区域，大致上有以下几种：  虚拟机栈 本地方法栈 元空间（jdk8以前是方法区） 堆 程序计数器   程序计数器是存储的是程序（线程）在执行时所需要的字节码指令。本地方法栈是执行一些native方法所需要的栈空间。虚拟机栈就是我们通常">
+<meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/jmm.png">
+<meta property="og:updated_time" content="2018-02-09T06:39:55.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="guava cache refreshAfterWrite">
-<meta name="twitter:description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
+<meta name="twitter:title" content="Java 内存相关总结">
+<meta name="twitter:description" content="JMMJMM (java memory model) java 内存模型。在java的世界里一切对象都运行在虚拟机中，对于有不同特征的数据，在虚拟机中会开辟不同的内存区域，大致上有以下几种：  虚拟机栈 本地方法栈 元空间（jdk8以前是方法区） 堆 程序计数器   程序计数器是存储的是程序（线程）在执行时所需要的字节码指令。本地方法栈是执行一些native方法所需要的栈空间。虚拟机栈就是我们通常">
+<meta name="twitter:image" content="http://p33uh193a.bkt.clouddn.com/jmm.png">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -130,65 +132,128 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="pages-guava-cache" class="article article-type-pages " itemscope itemprop="blogPost">
+            <article id="pages-jmm" class="article article-type-pages " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      guava cache refreshAfterWrite
+      Java 内存相关总结
     </h1>
   
 
         
-        <a href="/blog/2018/02/01/guava-cache/" class="archive-article-date">
-  	<time datetime="2018-02-01T01:37:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-01</time>
+        <a href="/blog/2018/02/08/jmm/" class="archive-article-date">
+  	<time datetime="2018-02-08T02:38:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-08</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将缓存项回收，并且guava cache 还提供了“缓存存在，返回缓存值，否则加载缓存值并返回” 的语义来对应日常比较常见的缓存使用场景。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> LoadingCache&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;  cache = CacheBuilder.<span class="keyword">new</span><span class="type">Builder</span>().maximumSize(<span class="number">100</span>)</span><br><span class="line">                                      .expireAfterWrite(<span class="number">10</span>, TimeUnit.MINUTES)</span><br><span class="line">                                      .build(<span class="keyword">new</span> <span class="type">CacheLoader</span>&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;() &#123;</span><br><span class="line">                    </span><br><span class="line">                                            @Override</span><br><span class="line">                                            <span class="keyword">public</span> <span class="keyword">String</span> load(<span class="keyword">String</span> key) throws Exception&#123;</span><br><span class="line">                                                <span class="keyword">return</span> <span class="string">"test"</span>;</span><br><span class="line">                                            &#125;</span><br><span class="line">                                      &#125;);</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line"><span class="keyword">String</span> value = cache.<span class="keyword">get</span>(<span class="string">"key"</span>);</span><br><span class="line"> <span class="comment">// cache.getUnchecked("key");</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">  e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>上述代码<code>cache.get(&quot;key&quot;)</code> 获取缓存中的值，缓存项将在写入10分钟后过期失效，10分钟后再有请求过来将会调用 load 方法加载并返回缓存值，这足以对应日常开发的大多数场景。</p>
+        <h2 id="JMM"><a href="#JMM" class="headerlink" title="JMM"></a>JMM</h2><p>JMM (java memory model) java 内存模型。在java的世界里一切对象都运行在虚拟机中，对于有不同特征的数据，在虚拟机中会开辟不同的内存区域，大致上有以下几种：</p>
+<ul>
+<li>虚拟机栈</li>
+<li>本地方法栈</li>
+<li>元空间（jdk8以前是方法区）</li>
+<li>堆</li>
+<li>程序计数器 </li>
+</ul>
+<p>程序计数器是存储的是程序（线程）在执行时所需要的字节码指令。本地方法栈是执行一些native方法所需要的栈空间。虚拟机栈就是我们通常所说的线程隔离的”线程栈“，它描述的是java线程中方法调用的内存模型，每一个方法的调用都会创建一个栈帧，栈帧中存放了方法的局部变量表，操作栈，方法出口等，方法的调用是栈帧入栈到出栈的过程，虚拟机栈与程序计数器都是线程隔离的。在jdk8以后把方法区改成了元空间，该区域是用于存放类信息，静态变量，常量和一些即时编译后的数据。而堆就是我们应用日常对象实例数据存放的地方了。</p>
 <a id="more"></a>
-<h2 id="缓存失效"><a href="#缓存失效" class="headerlink" title="缓存失效"></a>缓存失效</h2><p>guava 提供了几种缓存项失效策略：</p>
+<h2 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h2><p>java 堆我们用以下一张图解释</p>
+<p><img src="http://p33uh193a.bkt.clouddn.com/jmm.png" alt=""></p>
+<p>堆大体上可分为 young 与old 两个块区域， 其中yong 又可分为eden和surivor，surivor又可分为from和to 两块。</p>
 <ul>
-<li>expireAfterWrite ：缓存写入（创建或load）至一定时间后失效</li>
-<li>expireAfterAccess：缓存访问（读或者写）至一定时间后失效。读写都会重置初始时间。</li>
-<li>refreshAfterWrite：缓存写入（创建或load）至一定时间后失效，异步刷新</li>
+<li>对象初始创建时在eden上分配，如果是大对象则直接在old上分配</li>
+<li>当eden空间满时，发生一次minor gc，对象如果还存活，就将其移至from，对象存放的age + 1</li>
+<li>当from也满时，触发minor gc，如果对象还存活，将其移动至to，清空from，age + 1</li>
+<li>这时from 是空的，如果eden又有新进的对象过来，是存放在to的。每次发生minor gc时对象age +1</li>
+<li>当to也满时，重复类似from的步骤。直到age 达到一定值（默认15）,对象将被移动至old区</li>
 </ul>
-<p>对于失效的缓存项，guava cache并没有像redis或ehcache一样有个专门清除线程，guava cache清除缓存项依赖的是用户读写请求。也就是用户的读写请求在请求数据的同时也有可能在做一些数据清理工作。这样做的与另起线程相比的好处是不会有额外的线程开销，不会与用户请求线程相竞争。</p>
-<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>cache在提高RT的同时在一定程度保证了数据库的安全，但是如果大量并发请求下当缓存失效的时候，guava cache能否有效的避免缓存穿透呢？我们来做个实验。</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.peanut.cache;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.CacheBuilder;</span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.CacheLoader;</span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.LoadingCache;</span><br><span class="line"><span class="keyword">import</span> com.google.common.util.concurrent.ThreadFactoryBuilder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author peanut.huang</span></span><br><span class="line"><span class="comment"> * @date 2018/1/31.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GuavaDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> LoadingCache&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;  cache;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line"></span><br><span class="line">        ThreadFactory namedThreadFactory = <span class="keyword">new</span> <span class="type">ThreadFactoryBuilder</span>().setNameFormat(<span class="string">"cache test thread %d"</span>).build();</span><br><span class="line"></span><br><span class="line">        ExecutorService executorService =  <span class="keyword">new</span> <span class="type">ThreadPoolExecutor</span>(<span class="number">10</span>,<span class="number">10</span>,</span><br><span class="line">                                                                    <span class="number">0</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">                                                                    <span class="keyword">new</span> <span class="type">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">10</span>),</span><br><span class="line">                                                                    namedThreadFactory,</span><br><span class="line">                                                                    <span class="keyword">new</span> <span class="type">ThreadPoolExecutor</span>.AbortPolicy());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        cache = CacheBuilder.<span class="keyword">new</span><span class="type">Builder</span>()</span><br><span class="line">                            .maximumSize(<span class="number">100</span>)</span><br><span class="line">                            .expireAfterWrite(<span class="number">1</span>, TimeUnit.SECONDS)</span><br><span class="line">                            .build(<span class="keyword">new</span> <span class="type">CacheLoader</span>&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;() &#123;</span><br><span class="line"></span><br><span class="line">                                @Override</span><br><span class="line">                                <span class="keyword">public</span> <span class="keyword">String</span> load(<span class="keyword">String</span> key) throws Exception&#123;</span><br><span class="line">                                    </span><br><span class="line">                                    <span class="comment">//加载这个k-v 要耗时2秒</span></span><br><span class="line">                                    TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">                                    System.out.println(Thread.currentThread().getName() + <span class="string">"执行了load"</span>);</span><br><span class="line">                                    <span class="keyword">return</span> System.currentTimeMillis() + <span class="string">" : value"</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//初始加载</span></span><br><span class="line">        <span class="keyword">new</span> <span class="type">Thread</span>(<span class="keyword">new</span> <span class="type">CacheThread</span>(<span class="string">"key"</span>),<span class="string">"初始化线程"</span>).start();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//sleep 4 秒后缓存加载完且已失效</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">4</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//10个线程去竞争</span></span><br><span class="line">        <span class="keyword">for</span>(int k = <span class="number">0</span>; k &lt; <span class="number">10</span>; k++)&#123;</span><br><span class="line">            executorService.execute(<span class="keyword">new</span> <span class="type">CacheThread</span>(<span class="string">"key"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        executorService.shutdown();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CacheThread</span> <span class="keyword"><span class="keyword">implements</span> <span class="type">Runnable</span></span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">String</span> key;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> CacheThread(<span class="keyword">String</span> key) &#123;</span><br><span class="line">            <span class="built_in">this</span>.key = key;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        <span class="keyword">public</span> void run() &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">String</span> result =  cache.getUnchecked(key);</span><br><span class="line"></span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + result);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个我们用expireAfterWrite当缓存项创建一定时间后失效的策略。</p>
+<h2 id="对象存活"><a href="#对象存活" class="headerlink" title="对象存活"></a>对象存活</h2><p>对象是否存活是判断它是否应该被gc回收的依据。</p>
 <ul>
-<li>首先建一个初始线程加载k-v，加载这个k-v耗时2秒</li>
-<li>然后主线程sleep 4秒，这时加载的缓存已失效了</li>
-<li>开10个线程去竞争这个k-v资源</li>
+<li>引用计数法</li>
+<li>根索引算法</li>
 </ul>
-<p>输出结果：</p>
+<p>引用计数法是指给对象添加一个计数，当对象有其他对象引用他时，计数加1，当引用失效时计数减1。当计数为0时，说明该对象可以被回收。这个方法有个缺点就是没办法解决对象之间循环依赖的问题。类似下面的代码：</p>
+<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ObjA.field = ObjB<span class="comment">;</span></span><br><span class="line">ObjB.field = ObjA<span class="comment">;</span></span><br><span class="line"></span><br><span class="line"><span class="attribute">ObjA</span> = null<span class="comment">;</span></span><br><span class="line"><span class="attribute">ObjB</span> = null<span class="comment">;</span></span><br></pre></td></tr></table></figure>
+<p>相比于引用计数法，根索引算法就显得有效的多了，目前大多数商用程序语言都采用这种算法。 它的思路是这样的：通过一系列做为 “root” 节点的对象为起始点，如果其他对象到这些root节点有通达的路径(用图论的话来说是root到对象是可达的)，那么对象就不能被回收，直到对象与root之间没有可达路径，那么对象才可以被回收。可作为root节点的有：</p>
 <blockquote>
-<p>初始化线程执行了load<br>初始化线程:1517467068878 : value<br>cache test thread 0执行了load<br>cache test thread 9:1517467072872 : value<br>cache test thread 7:1517467072872 : value<br>cache test thread 6:1517467072872 : value<br>cache test thread 4:1517467072872 : value<br>cache test thread 2:1517467072872 : value<br>cache test thread 8:1517467072872 : value<br>cache test thread 1:1517467072872 : value<br>cache test thread 3:1517467072872 : value<br>cache test thread 5:1517467072872 : value<br>cache test thread 0:1517467072872 : value</p>
+<p>方法区中的常量引用的对象<br>方法区中的静态属性引用的对象<br>虚拟机栈中引用的对象<br>本地方法栈中引用的对象</p>
 </blockquote>
-<p>可以看出执行了load的线程只有初始线程和<code>cache test thread 0</code> 也就是说竞争k-v的10个线程中只有一个线程会去真正的load, 其他线程都是阻塞的,等待其中一个线程load完才回返value，所以10个线程的毫秒数都是一样的。</p>
-<p>那有没有不阻塞线程的做法呢？ 有的<code>refreshAfterWrite</code>出场了。我们把代码稍稍改一下：把 <code>expireAfterWrite</code> 换成 <code>refreshAfterWrite</code>, build 中添加reload 方法</p>
-<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">cache = CacheBuilder.newBuilder()</span><br><span class="line">                           .maximumSize(<span class="number">100</span>)</span><br><span class="line">                           .refreshAfterWrite(<span class="number">1</span>, TimeUnit.SECONDS)</span><br><span class="line">                           .build(<span class="keyword">new</span> CacheLoader&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;() &#123;</span><br><span class="line"></span><br><span class="line">                               @Override</span><br><span class="line">                               <span class="keyword">public</span> <span class="keyword">String</span> load(<span class="keyword">String</span> <span class="built_in">key</span>) <span class="keyword">throws</span> Exception&#123;</span><br><span class="line"></span><br><span class="line">                                   <span class="comment">//加载这个k-v 要耗时2秒</span></span><br><span class="line">                                   TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">                                   System.out.<span class="built_in">println</span>(Thread.currentThread().getName() + <span class="string">"执行了 load"</span>);</span><br><span class="line">                                   <span class="keyword">return</span> System.currentTimeMillis() + <span class="string">" : value"</span>;</span><br><span class="line">                               &#125;</span><br><span class="line"></span><br><span class="line">                               @Override</span><br><span class="line">                               <span class="keyword">public</span> ListenableFuture&lt;<span class="keyword">String</span>&gt; reload(<span class="keyword">String</span> <span class="built_in">key</span>, <span class="keyword">String</span> oldValue) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">                                   System.out.<span class="built_in">println</span>(Thread.currentThread().getName() + <span class="string">"执行了 reload"</span>);</span><br><span class="line">                                   <span class="keyword">return</span> Futures.immediateFuture(System.currentTimeMillis() + <span class="string">" : reload value"</span>);</span><br><span class="line"></span><br><span class="line">                               &#125;</span><br><span class="line">                           &#125;);</span><br></pre></td></tr></table></figure>
-<p>再看一下输出结果：</p>
-<blockquote>
-<p>初始化线程执行了 load<br>初始化线程:1517468249417 : value<br>cache test thread 0执行了 reload<br>cache test thread 1:1517468249417 : value<br>cache test thread 2:1517468249417 : value<br>cache test thread 3:1517468249417 : value<br>cache test thread 4:1517468249417 : value<br>cache test thread 5:1517468249417 : value<br>cache test thread 6:1517468249417 : value<br>cache test thread 7:1517468249417 : value<br>cache test thread 8:1517468249417 : value<br>cache test thread 9:1517468249417 : value<br>cache test thread 0:1517468251403 : reload value</p>
-</blockquote>
-<p>可以看出10个竞争的线程1-9线程都返回了旧值，只有 <code>cache test thread 0</code> 执行了reload，并返回了新的reload value。 实现了多线程竞争了只有一个线程阻塞去处理更新，其他线程返回旧值。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>refreshAfterWrite 能有效的避免大量请求下的缓存穿透，其方式是返回旧值来避免。</li>
-<li>load 或者reload 返回null，将会抛出异常</li>
-<li>guava cache的更新与淘汰策略都依赖于用户请求线程</li>
-<li>缓存的读，写，load，reload都有可能重置其 “创建时间”。<strong>但是如果是对视图的操作将不受影响。</strong></li>
+<p>然而并不是说不可达对象就一定会被回收，如果不对达对象复写了finalize()并且发生了调用，那将会对对象进行一次”拯救“，如果此时对象又与root节点保持了可通达性，那么对象将会被救活，并且finalize方法只能被调用一次。</p>
+<h2 id="GC-算法"><a href="#GC-算法" class="headerlink" title="GC 算法"></a>GC 算法</h2><ul>
+<li>标记清除法</li>
+<li>复制算法</li>
+<li>标记-整理算法</li>
+<li>分代收集算法</li>
 </ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/google/guava/wiki" target="_blank" rel="noopener">google guava</a></p>
-<p><a href="http://ifeve.com/google-guava-cachesexplained/" target="_blank" rel="noopener">google guava 中文翻译</a></p>
+<p>标记清除法：该算法有两个阶段，标记阶段和清除阶段。对于不可达对象先进行一次统一的标记，在标记完后统一进行清除标记过的对象。该算法是最基础的算法，它存在两个缺点：</p>
+<ul>
+<li>一个是效率问题： 标记和清除的过程效率都不高</li>
+<li>产生空间碎片：清除之后将产生大量的内存碎片。如果这时要分配一个比较大的内存的话会额外的要求再进行一次标记清除运作。</li>
+</ul>
+<p>复制算法；该算法的思想是对内存按容量分为两块大小一样的区域，每次只使用其中的一块。当其中一块满时触清理，同时把存放的对象移至另一块区域内，再将这块区域清空。这样始终保持一块是空的，两块内存轮流使用。这种算法，不会内存碎片的问题。因为它每次对其中一块内存清理，完了移动到另一块，在移动的时候对内存重新整理了一遍。缺点很明显，将内存分为了两块，容量直接对半砍了，代价有点高。不过hotspot虚拟机采用的正是这种算法回收年轻代，因为这种算法处理那些存活时间短的对象是很有优势的，而我们大多数的对象都是 “朝闻夕死”。</p>
+<p>标记整理算法：复制算法对那些存活时间长的对象要频繁的复制，移动，效率比较低。标记整理算法和前面的标记清除算法类似，不同的是在标记完成后不是直接的清除就完了，而是有一个整理的步骤，所有存放的对象往一端移动，然后清理掉端边界以外的内存。</p>
+<p>分代收集算法：现在虚拟机大多采用这种算法，针对内存数据存活时间不同将内存分为不同的区域：年轻代与老年代。不同区域分别使用不同的收集算法。比如：年轻代的对象大都 ”朝闻夕死“就采用复制算法，而老年代的对象都是存活时间较长的，就采用标记整理或标记清除算法。</p>
+<h2 id="GC-收集器"><a href="#GC-收集器" class="headerlink" title="GC 收集器"></a>GC 收集器</h2><p>在上述gc收集算法的基础上产生了一系列的gc收集器，常见的有以下几种：</p>
+<ul>
+<li>Serial 收集器</li>
+<li>ParNew 收集器</li>
+<li>Parallel Scavenge 收集器</li>
+<li>Serial Old 收集器</li>
+<li>Parallel Old 收集器</li>
+<li>CMS 收集器</li>
+<li>G1 收集器</li>
+</ul>
+<h3 id="Serial-收集器"><a href="#Serial-收集器" class="headerlink" title="Serial 收集器"></a>Serial 收集器</h3><p>最基本，也最悠久的收集器了，它是一个单线程收集器，也就是说它只会使用一个cpu或者一个线程去完成收集工作。更重要的是它会产生 “stop the world”，它在进行收集工作的时候，其他应用线程都是暂停的。形象的比喻就是 “妈妈在打扫房间的时候，你得老实的等着，不能再往地上扔垃圾”。相比于stop the world的缺点，它的优点在于单线程工作的简单而高效，对于限定单个cpu的环境来说，它是没有线程交互的开销的，自然可以获取最高的单线程收集效率。</p>
+<h3 id="ParNew-收集器"><a href="#ParNew-收集器" class="headerlink" title="ParNew 收集器"></a>ParNew 收集器</h3><p>ParNew其实是Serial的多线程版，它将提供多条线程并行的进行垃圾收集。这里说明一下并行与并发的区别：</p>
+<blockquote>
+<p>并行：多个垃圾收集线程一起进行，这时应用线程是等待的<br>并发：垃圾收集线程与应用线程是一起或者交替运行的</p>
+</blockquote>
+<p>ParNew 除了多线程外，它更多的是在Server模式下虚拟机首选的年轻化收集器。<strong>除了Serial外，目前只有它能与CMS 收集器配合工作</strong> 在使用 -XX:+UseConcMarkSweepGC后默认使用ParNew为新生代收集器，也可以使用：-XX:+UseParNewGC 来强制指定。</p>
+<h3 id="Parallel-Scavenge-收集器"><a href="#Parallel-Scavenge-收集器" class="headerlink" title="Parallel Scavenge 收集器"></a>Parallel Scavenge 收集器</h3><p>它也是一个年轻代的收集器，也是采用复制算法，也是并行的多线程收集器，不同于ParNew它设计的目标是达到一个可控制的吞吐量，即 吞吐量=运行用户代码时间 / （运行用户代码时间 + 垃圾收集时间），虚拟机总运行100分钟，垃圾收集花掉1分钟，那吞吐量就是99%。</p>
+<h3 id="Serial-Old-收集器"><a href="#Serial-Old-收集器" class="headerlink" title="Serial Old 收集器"></a>Serial Old 收集器</h3><p>Serial收集器的老年代版本，也是一个单线程收集器，采用 标记-整理算法。</p>
+<h3 id="Parallel-Old-收集器"><a href="#Parallel-Old-收集器" class="headerlink" title="Parallel Old 收集器"></a>Parallel Old 收集器</h3><p>是Parelle Scavenge的老年代版本，使用多线程和标记-整理算法。</p>
+<h3 id="CMS-收集器"><a href="#CMS-收集器" class="headerlink" title="CMS 收集器"></a>CMS 收集器</h3><p> Concurrent Mark Sweep ，它是一种以获取最短停顿时间为目标的收集器。从名字可以看出它是一种并发的标记清除收集器。可以分为4个步骤：</p>
+<ul>
+<li>初始标记 (initial mark)</li>
+<li>并发标记 (concurrent mark)</li>
+<li>重新标记 (remark)</li>
+<li>并发清除 (concurrent sweep)</li>
+</ul>
+<p>其中初始标记与重新标记会 stop the world。</p>
+<p>初始标记：仅仅标记root能直接关联到的对象，速度很快<br>并发标记： 这个阶段就是对象与root 之间可通达性的处理过程<br>重新标记：这个阶段则是为了修正并发标记期间，用户程序继续运行而导致标记变动的那一部分对象的标记记录。<br>并发清除：用户线程与清除线程并发运行清理。</p>
+<p>事个过程中最耗时的是并发标记与并发清除，收集器线程可以与用户线程一起工作，所以总体上来说，CMS收集器的内存回收过程是与用户线程一起并发的执行的。它一款优秀的收集器，表现在于：并发性，低停顿。但它也有三个缺点：</p>
+<ul>
+<li><p>对cpu资源敏感 ： 在并发阶段，它虽然不会导致用户线程停顿，但是是占用了一部分cpu资源而导致应用变慢。</p>
+</li>
+<li><p>CMS 无法处理浮动垃圾： 所谓浮动垃圾就是在并发清除阶段，用户线程还在运行着，这个过程中产生的新的垃圾就是浮动垃圾。浮动垃圾只能等到下次gc才能清除。正是因为收集线程与用户线程并存，所以old区域通常要预留一部分的内存空间给用户线程使用，因此CMS在老年代使用68%(默认)就会被激活，可以设置-XX:CMSInitiatingOccupancyFraction=68 值来设置百分比。如果预留内存无法满足应用需要，会出现 “Concurrent Mode Failure”失败，这时会临时启用Serial Old来进行老年代收集，这样停顿时间就很长了。</p>
+</li>
+<li><p>标记-清除算法的内存碎片问题：碎片过多无法分配大对象时，不得不提前触发Full GC。CMS提供了-XX+UseCMSCompactAtFullCollection 在Full GC 之后额外增加一个碎片整理过程。整理过程是无法并发的，停顿时间就变长了。此外还提供了 -XX:CMSFullGCsBeforeCompaction 这个参数来设置在多少次不压缩的Full GC 后，跟着来一次带压缩的。</p>
+</li>
+</ul>
+<h3 id="G1-收集器"><a href="#G1-收集器" class="headerlink" title="G1 收集器"></a>G1 收集器</h3><p>G1 (Garbage First) 是垃圾收集器理论进一步发展的产物，它与前面的CMS收集器相比有两个显著的改进：</p>
+<ul>
+<li>G1收集器是基于 标记-整理 算法实现，也就是说它不会产生垃圾碎片。</li>
+<li>它可以精确地地控制停顿，既能让使用者明确指定在一个长度为M毫秒的时间片段内，消耗在垃圾收集上的时间不超过N毫秒。</li>
+</ul>
+<p>G1收集器可以实现在基本不牺牲吞吐量的前提下完成低停顿的内存回收。G1将整个堆（包括新生代和老年代）划分为多个大小固定的独立区域（region），并且跟踪这些区域里面的垃圾堆积程度，在后台维护了一个优先列表，每次根据允许的收集时间，优先回收垃圾最多的区域(这就是Garbage First 的由来)。区域划分及有优先级的区域回收，保证了G1收集器在有限的时间内可以获得最高的收集效率。</p>
+<h2 id="参数总结"><a href="#参数总结" class="headerlink" title="参数总结"></a>参数总结</h2><p>-XX:+UseSerialGC ： 虚拟机运行在Client模式下的默认值，打开此开关后，使用 Serial + Serial Old 收集器组合分别回收新生代和老年代</p>
+<p>-XX:+UseParNewGC ：打开此开关后，使用ParNew + Serial Old 收集器组合分别回收新生代和老年代</p>
+<p>-XX:+UseConcMarkSweepGC ：打开此开关后使用ParNew + CMS + Serial Old 收集器组合分别回收新生代(ParNew)与老年代(CMS + Serial Old)。Serial Old 将在CMS出现 Concurrent Mode Failure失败后使用</p>
+<p>-XX:+UseParallelGC ：虚拟机运行在Server模式下的默认值，打开此开关后，使用 Parallel Scavenge + Serial Old 的收集器组合回收</p>
+<p>-XX:UseParallelOldGC ：打开此开关后，使用Parallel Scavenge + Parallel Old 的收集器组合回收</p>
+<p>SurvivorRatio ：新生代中Eden与Survivor的容量比，默认是8，即Eden : Survivor = 8:1</p>
+<p>PretenureSizeThreshold : 直接晋升到老年代对象的大小，设置这个参数后，大于这个参数的对象直接在老年代分配</p>
+<p>MaxTenuringThreshold ： 晋升到老年代对象的年龄，每个对象在坚持过一次Minor GC后，年龄都加1，超过这个值就进入老年代，默认15</p>
+<p>ParallelGCThreads ： 设置并行GC时进行内存回收的线程数</p>
+<p>CMSInitiatingOccupancyFraction ： 设置CMS 收集器在老年代空间被使用多少后触发收集，默认 68%</p>
+<p>UseCMSCompactAtFullCollection ： 设置CMS收集器在完成收集后是否要进行一次内存碎片整理</p>
+<p>CMSFullGCsBeforeCompaction ： 设置CMS 收集器在进行若干次收集后再进行一次内存碎片整理</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>深入理解Java虚拟机</p>
 
       
 
@@ -197,21 +262,6 @@
     <div class="article-info article-info-index">
       
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Guava</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
       
 
       
@@ -262,7 +312,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/02/01/guava-cache/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/02/08/jmm/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -276,18 +326,9 @@
   
 <nav id="article-nav">
   
-    <a href="/blog/2018/02/01/线程状态流转/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          java线程状态流转
-        
-      </div>
-    </a>
   
-  
-    <a href="/blog/2018/01/25/jsonReader/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">json文件导入</div>
+    <a href="/blog/2018/02/07/cas/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">CAS的一点理解</div>
       <i class="icon-circle-right"></i>
     </a>
   
