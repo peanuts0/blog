@@ -6,18 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>Archives | 花生的博客</title>
+  <title>redis持久化之RDB | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="坐标杭州，二流程序员">
-<meta name="keywords" content="后端，linux，java，spring，分布式，python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="花生的博客">
-<meta property="og:url" content="//peanuts0.github.io/archives/index.html">
+  <meta name="description" content="介绍redis为保证数据可用性提供了相关的持久化技术： RDB(redis database)和AOF(append only file)。两者各有其优缺点，针对不同场景可使用不同的持久化方案，或者是两者同时使用。">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis持久化之RDB">
+<meta property="og:url" content="//peanuts0.github.io/2018/02/20/redis-rdb/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="坐标杭州，二流程序员">
+<meta property="og:description" content="介绍redis为保证数据可用性提供了相关的持久化技术： RDB(redis database)和AOF(append only file)。两者各有其优缺点，针对不同场景可使用不同的持久化方案，或者是两者同时使用。">
+<meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/redis.jpeg">
+<meta property="og:updated_time" content="2018-02-20T09:36:36.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="花生的博客">
-<meta name="twitter:description" content="坐标杭州，二流程序员">
+<meta name="twitter:title" content="redis持久化之RDB">
+<meta name="twitter:description" content="介绍redis为保证数据可用性提供了相关的持久化技术： RDB(redis database)和AOF(append only file)。两者各有其优缺点，针对不同场景可使用不同的持久化方案，或者是两者同时使用。">
+<meta name="twitter:image" content="http://p33uh193a.bkt.clouddn.com/redis.jpeg">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -129,36 +132,68 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="pages-redis-rdb" class="article article-type-pages " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/blog/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/20/redis-rdb/" class="archive-article-date">
-  	<time datetime="2018-02-20T07:43:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-20</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/20/redis-rdb/">redis持久化之RDB</a>
+    <h1 class="article-title" itemprop="name">
+      redis持久化之RDB
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/blog/2018/02/20/redis-rdb/" class="archive-article-date">
+  	<time datetime="2018-02-20T07:43:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-20</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://p33uh193a.bkt.clouddn.com/redis.jpeg" alt=""></p>
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>redis为保证数据可用性提供了相关的持久化技术： RDB(redis database)和AOF(append only file)。两者各有其优缺点，针对不同场景可使用不同的持久化方案，或者是两者同时使用。</p>
+<a id="more"></a>
+<p>rdb持久化可以在指定的时间间隔内生成数据集的时间点快照(point-in-time snapshot)。使用该持久化方案时redis 内部会有一个定时器，每隔固定时间会去检查当前数据发生变更是否满足参数设置的触发条件，如果满足，那么主进程将会fork出一个子进程，子进程与主进程共享相同的地址空间，子进程进行存储工作，主进程继续接受其他客户端的请求。如果这时主进程有写请求，主子进程采用copy-on-write方式来保证主子进程之间不会相互影响。也就是说在写请求时，<strong>主进程会先复制一份内存的page页作为副本，对这个副本进行写入，然后再将内存地址指向该副本。</strong>这里举个java中CopyOnWriteArrayList的add实现的例子：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> boolean <span class="title">add</span>(<span class="params">E e</span>) </span>&#123;</span><br><span class="line">   final ReentrantLock <span class="keyword">lock</span> = <span class="keyword">this</span>.<span class="keyword">lock</span>;</span><br><span class="line">   <span class="keyword">lock</span>.<span class="keyword">lock</span>();</span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       Object[] elements = getArray();</span><br><span class="line">       <span class="keyword">int</span> len = elements.length;</span><br><span class="line">       Object[] newElements = Arrays.copyOf(elements, len + <span class="number">1</span>);</span><br><span class="line">       newElements[len] = e;</span><br><span class="line">       setArray(newElements);</span><br><span class="line">       <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">   &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">       <span class="keyword">lock</span>.unlock();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="RDB的优点："><a href="#RDB的优点：" class="headerlink" title="RDB的优点："></a>RDB的优点：</h2><ul>
+<li>rdb是一个非常紧凑的文件，它保存了redis在某个时间点上的数据集。这种文件非常适合用于备份，可以通过不同的备份文件还原到不同的数据版本</li>
+<li>rdb可以最大化redis的性能：你进程在保存rdb时唯一要做的就是fork出一个子进程，子进程去处理数据保存工作，主进程无须任何i/o操作</li>
+<li>rdb 在恢复大数据集时的速度比aof的速度要快</li>
+</ul>
+<h2 id="RDB的缺点："><a href="#RDB的缺点：" class="headerlink" title="RDB的缺点："></a>RDB的缺点：</h2><ul>
+<li>rdb是定时快照，它只代表一个时间段内的内存快照，而当系统重启时会丢失上次快照与重启之间的数据。</li>
+<li>rdb要fork出子进程来做持久化的工作，在数据集比较庞大时，fork可能会非常耗时，造成服务器在某某毫秒内（甚至一秒）停止处理客户端面。虽然AOF也要fork，但无论AOF重写的执行间隔有多长，数据的耐久性都不会有任何的损失。</li>
+</ul>
+<h2 id="RDB设置"><a href="#RDB设置" class="headerlink" title="RDB设置"></a>RDB设置</h2><p>RDB是redis默认的持久化策略，可以通过redis.conf来设置RDB：</p>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line">################################ SNAPSHOTTING  ################################</span><br><span class="line">#</span><br><span class="line"># Save the DB on disk:</span><br><span class="line">#</span><br><span class="line">#   save &lt;seconds&gt; &lt;changes&gt;</span><br><span class="line">#</span><br><span class="line">#   Will save the DB <span class="keyword">if</span> both the given number <span class="keyword">of</span> seconds and the given</span><br><span class="line">#   number <span class="keyword">of</span> write operations against the DB occurred.</span><br><span class="line">#</span><br><span class="line">#   In the example below the behaviour will be to save:</span><br><span class="line">#   after <span class="number">900</span> sec (<span class="number">15</span> min) <span class="keyword">if</span> at least <span class="number">1</span> key changed</span><br><span class="line">#   after <span class="number">300</span> sec (<span class="number">5</span> min) <span class="keyword">if</span> at least <span class="number">10</span> keys changed</span><br><span class="line">#   after <span class="number">60</span> sec <span class="keyword">if</span> at least <span class="number">10000</span> keys changed</span><br><span class="line">#</span><br><span class="line">#   Note: you can disable saving completely by commenting out all <span class="string">"save"</span> lines.</span><br><span class="line">#</span><br><span class="line">#   It is also possible to remove all the previously configured save</span><br><span class="line">#   points by adding a save directive <span class="keyword">with</span> a single empty string argument</span><br><span class="line">#   like <span class="keyword">in</span> the following example:</span><br><span class="line">#</span><br><span class="line">#   save <span class="string">""</span></span><br><span class="line"></span><br><span class="line">#<span class="number">15</span>分钟内至少有<span class="number">1</span>个key更改</span><br><span class="line">save <span class="number">900</span> <span class="number">1</span></span><br><span class="line">save <span class="number">300</span> <span class="number">10</span></span><br><span class="line">save <span class="number">60</span> <span class="number">10000</span></span><br><span class="line"></span><br><span class="line"># By default Redis will stop accepting writes <span class="keyword">if</span> RDB snapshots are enabled</span><br><span class="line"># (at least one save point) and the latest background save failed.</span><br><span class="line"># This will make the user aware (<span class="keyword">in</span> a hard way) that data is not persisting</span><br><span class="line"># on disk properly, <span class="keyword">otherwise</span> chances are that no one will notice and some</span><br><span class="line"># disaster will happen.</span><br><span class="line">#</span><br><span class="line"># If the background saving process will start working again Redis will</span><br><span class="line"># automatically allow writes again.</span><br><span class="line">#</span><br><span class="line"># However <span class="keyword">if</span> you have setup your proper monitoring <span class="keyword">of</span> the Redis server</span><br><span class="line"># and persistence, you may want to disable this feature so that Redis will</span><br><span class="line"># continue to work <span class="keyword">as</span> usual even <span class="keyword">if</span> there are problems <span class="keyword">with</span> disk,</span><br><span class="line"># permissions, and so forth.</span><br><span class="line"></span><br><span class="line">#fork的子进程保存数据出错时停止主进程写</span><br><span class="line">stop-writes-on-bgsave-error yes</span><br><span class="line"></span><br><span class="line"># Compress string objects using LZF when dump .rdb databases?</span><br><span class="line"># For default that<span class="string">'s set to '</span>yes<span class="string">' as it'</span>s almost always a win.</span><br><span class="line"># If you want to save some CPU <span class="keyword">in</span> the saving child set it to <span class="string">'no'</span> but</span><br><span class="line"># the dataset will likely be bigger <span class="keyword">if</span> you have compressible values or keys.</span><br><span class="line"></span><br><span class="line">## 启用rdb文件压缩：压缩耗cpu，不压缩耗空间</span><br><span class="line">rdbcompression yes</span><br><span class="line"></span><br><span class="line"># Since version <span class="number">5</span> <span class="keyword">of</span> RDB a CRC64 checksum is placed at the end <span class="keyword">of</span> the file.</span><br><span class="line"># This makes the format more resistant to corruption but there is a performance</span><br><span class="line"># hit to pay (around <span class="number">10</span>%) when saving and loading RDB files, so you can disable it</span><br><span class="line"># for maximum performances.</span><br><span class="line">#</span><br><span class="line"># RDB files created <span class="keyword">with</span> checksum disabled have a checksum <span class="keyword">of</span> zero that will</span><br><span class="line"># tell the loading <span class="keyword">code</span> to skip the check.</span><br><span class="line"></span><br><span class="line">#rdb检验，注重性能时可以关闭这个</span><br><span class="line">rdbchecksum yes</span><br><span class="line"></span><br><span class="line"># The filename <span class="keyword">where</span> to dump the DB</span><br><span class="line"></span><br><span class="line">#rdb 保存文件名</span><br><span class="line">dbfilename dump.rdb</span><br><span class="line"></span><br><span class="line"># The working directory.</span><br><span class="line">#</span><br><span class="line"># The DB will be written inside this directory, <span class="keyword">with</span> the filename specified</span><br><span class="line"># above using the <span class="string">'dbfilename'</span> configuration directive.</span><br><span class="line">#</span><br><span class="line"># The Append Only File will also be created inside this directory.</span><br><span class="line">#</span><br><span class="line"># Note that you must specify a directory here, not a file name.</span><br><span class="line"></span><br><span class="line"># 上述保存文件的目录</span><br><span class="line">dir ./</span><br></pre></td></tr></table></figure>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><p>我在mac本机上的例子(版本：Redis 3.2.8 (00000000/0) 64 bit)</p>
+<p>redis-server 启动</p>
+<blockquote>
+<p>4302:M 20 Feb 17:17:13.276 # Server started, Redis version 3.2.8<br>4302:M 20 Feb 17:17:13.276 * The server is now ready to accept connections on port 6379</p>
+</blockquote>
+<p>redis-cli 启动并设置值，save 调用rdb保存</p>
+<blockquote>
+<p>127.0.0.1:6379&gt; set b 456<br>OK<br>127.0.0.1:6379&gt; get b<br>“456”<br>127.0.0.1:6379&gt; save<br>OK<br>27.0.0.1:6379&gt; bgsave<br>Background saving started</p>
+</blockquote>
+<p>注：save是主进程保存，bgsave是fork子进程保存</p>
+<p>redis-server 结束进程</p>
+<blockquote>
+<p>4302:M 20 Feb 17:22:42.095 # User requested shutdown…<br>4302:M 20 Feb 17:22:42.095 <em> Saving the final RDB snapshot before exiting.<br>4302:M 20 Feb 17:22:42.097 </em> DB saved on disk<br>4302:M 20 Feb 17:22:42.097 # Redis is now ready to exit, bye bye…</p>
+</blockquote>
+<p>再重启redis-server，redis-cli 再重连</p>
+<blockquote>
+<p>127.0.0.1:6379&gt; get b<br>“456”</p>
+</blockquote>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -170,385 +205,122 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/02/20/redis-rdb/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/08/jmm/" class="archive-article-date">
-  	<time datetime="2018-02-08T02:38:44.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-08</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2018/02/08/jmm/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Java 内存相关总结</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/08/jmm/">Java 内存相关总结</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/07/cas/" class="archive-article-date">
-  	<time datetime="2018-02-07T07:39:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/07/cas/">CAS的一点理解</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/05/CyclicBarrier/" class="archive-article-date">
-  	<time datetime="2018-02-05T09:26:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-05</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/05/CyclicBarrier/">CyclicBarrier 详解</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/02/countdownlatch/" class="archive-article-date">
-  	<time datetime="2018-02-02T06:09:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-02</time>
-</a>
-        </div>
-    	 
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '{{page.articleID}}',
+  owner: 'peanuts0',
+  repo: 'blog',
+  oauth: {
+    client_id: '17716911d1143cda96e6',
+    client_secret: '9be9112ba195381de296db28a6eda05903c65d16',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/02/countdownlatch/">CountDownLatch 详解</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/01/线程状态流转/" class="archive-article-date">
-  	<time datetime="2018-02-01T10:40:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-01</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/01/线程状态流转/">java线程状态流转</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/01/guava-cache/" class="archive-article-date">
-  	<time datetime="2018-02-01T01:37:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-01</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/01/guava-cache/">guava cache refreshAfterWrite</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Guava</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/01/25/jsonReader/" class="archive-article-date">
-  	<time datetime="2018-01-25T05:53:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-25</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/01/25/jsonReader/">json文件导入</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/01/22/15166108339904/" class="archive-article-date">
-  	<time datetime="2018-01-22T08:47:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/01/22/15166108339904/">scp</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">命令</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/01/22/15165864139104/" class="archive-article-date">
-  	<time datetime="2018-01-22T02:00:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/01/22/15165864139104/">btrace 初使用</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">工具</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -571,8 +343,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
