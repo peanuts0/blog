@@ -6,18 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>花生的博客</title>
+  <title>redis 持久化之AOF | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="坐标杭州，二流程序员">
-<meta name="keywords" content="后端，linux，java，spring，分布式，python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="花生的博客">
-<meta property="og:url" content="//peanuts0.github.io/page/2/index.html">
+  <meta name="description" content="介绍继续上篇的RDB介绍，这篇我们介绍一下AOF(append only file)的持久化方式。不同于RDB的周期性快照备份，AOF则是每收到一个写命令都会通过write()系统函数追加到aof文件中，类似于mysql的binlog。">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis 持久化之AOF">
+<meta property="og:url" content="//peanuts0.github.io/2018/02/22/redis-aof/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="坐标杭州，二流程序员">
+<meta property="og:description" content="介绍继续上篇的RDB介绍，这篇我们介绍一下AOF(append only file)的持久化方式。不同于RDB的周期性快照备份，AOF则是每收到一个写命令都会通过write()系统函数追加到aof文件中，类似于mysql的binlog。">
+<meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/redis.jpeg">
+<meta property="og:updated_time" content="2018-02-22T08:31:48.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="花生的博客">
-<meta name="twitter:description" content="坐标杭州，二流程序员">
+<meta name="twitter:title" content="redis 持久化之AOF">
+<meta name="twitter:description" content="介绍继续上篇的RDB介绍，这篇我们介绍一下AOF(append only file)的持久化方式。不同于RDB的周期性快照备份，AOF则是每收到一个写命令都会通过write()系统函数追加到aof文件中，类似于mysql的binlog。">
+<meta name="twitter:image" content="http://p33uh193a.bkt.clouddn.com/redis.jpeg">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -129,39 +132,51 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-    <article id="pages-jsonReader" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
+            <article id="pages-redis-aof" class="article article-type-pages " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/01/25/jsonReader/">json文件导入</a>
+    <h1 class="article-title" itemprop="name">
+      redis 持久化之AOF
     </h1>
   
 
         
-        <a href="/blog/2018/01/25/jsonReader/" class="archive-article-date">
-  	<time datetime="2018-01-25T05:53:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-25</time>
+        <a href="/blog/2018/02/22/redis-aof/" class="archive-article-date">
+  	<time datetime="2018-02-22T07:20:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-22</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>现在有一个全国省市区数据的json文件数据要导入数据库</p>
-<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>最简单的办法就是把这些json字符串放入一个String中，然后再用fastJson等类库，把String转换成对应的对象，再作其他入库处理。 这个有个问题就是String的大小容量问题</p>
-<h5 id="放-String为何不合适"><a href="#放-String为何不合适" class="headerlink" title="放 String为何不合适"></a>放 String为何不合适</h5><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/** <span class="type">The</span> <span class="keyword">value</span> is used <span class="keyword">for</span> character storage. */</span><br><span class="line">    <span class="keyword">private</span> final <span class="built_in">char</span> <span class="keyword">value</span><span class="literal">[]</span>;</span><br></pre></td></tr></table></figure>
-<p>String 的数据其实都是放在了这个final的字符数组中，那么其长度限制就是Integer.MAX_VALUE 也就是2^31 - 1 = 2147483647 。那么如果这个vaue[]<br>占满了，要耗费多少内存呢？</p>
-<p>这个我们插入一个知识点：</p>
-<blockquote>
-<p>字节：byte<br>    位：bit<br>    字符：char<br>    一个字节占8位，也就是1 byte = 8 bit<br>    一个字符占16位，也就是1 char = 16 bit = 2 byte<br>    1KB = 1024 byte<br>    1MB = 1024 KB<br>    1GB = 1024 MB<br>    1TB = 1024 GB</p>
-</blockquote>
-        
-          <a class="article-more-a" href="/blog/2018/01/25/jsonReader/#more">more >></a>
-        
+        <p><img src="http://p33uh193a.bkt.clouddn.com/redis.jpeg" alt=""></p>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>继续上篇的<a href="https://peanuts0.github.io/blog/2018/02/20/redis-rdb/#more" target="_blank" rel="noopener">RDB</a>介绍，这篇我们介绍一下AOF(append only file)的持久化方式。不同于RDB的周期性快照备份，AOF则是每收到一个写命令都会通过write()系统函数追加到aof文件中，类似于mysql的binlog。</p>
+<a id="more"></a>
+<h3 id="AOF的优点"><a href="#AOF的优点" class="headerlink" title="AOF的优点"></a>AOF的优点</h3><ul>
+<li><p>使用AOF持久化会让redis变得非常耐久，可以设置不同的fsync策略</p>
+<ul>
+<li><code>appendfsync everysec</code> ：每秒钟强制写入磁盘一次，在性能和持久化方面做了很好的折中，是受推荐的方式，就算发生了故障也只会丢失一秒钟的数据</li>
+<li><code>appendfsync always</code> ：每次收到写命令就立即强制写入磁盘，是最有保证的完全的持久化，但速度也是最慢的，一般不推荐使用</li>
+<li><code>appendfsync no</code>：完全依赖OS的写入，一般为30秒左右一次，性能最好但是持久化最没有保证，不被推荐</li>
+</ul>
+</li>
+<li><p>AOF文件是一个只进行追加操作的日志文件(append only log)类似于mysql中的binlog，因此对AOF文件的写入不需要进行seek，即使日志因为某些原因而包含了未写信完整的命令(比如写入时磁盘已满，写入中途停机等等)，redis-check-aof工具也可以轻易地修复这种问题</p>
+</li>
+<li><p>Redis 可以在AOF文件体积变得过大时，自动地在后台对AOF进行重写：重写后的新AOF文件包含了恢复当前数据集所需要的最小命令集合。整个重写操作是绝对安全的，因为redis在创建新AOF文件的过程中，会继续将命令追加到现有的AOF文件里，即使重写过程中发生了停机，现在的AOF文件也不会丢失。而一旦新的AOF文件创建完成，redis会从旧AOF文件切换到新的AOF文件，并开始对新AOF文件进行追加操作</p>
+</li>
+<li><p>AOF文件有序的保存了寻数据库执行的所有写操作，这些写操作以redis 协议的格式保存，因此AOF文件的内容非常容易被人读懂，对文件进行分析也很轻松。导出AOF文件也很简单。比如：不小心执行了FLUSHALL 命令，但只要AOF文件未被重写，那么只要停止服务器，移除AOF文件末尾的FLUSHALL命令，并重启redis，就可以将数据恢复到FLUSHALL执行之前的状态</p>
+</li>
+</ul>
+<h3 id="AOF的缺点"><a href="#AOF的缺点" class="headerlink" title="AOF的缺点"></a>AOF的缺点</h3><ul>
+<li>对于相同的数据集来说，AOF文件的体积通常要比RDB文件的体积大</li>
+<li>根据所使用的fsync策略，AOF的速度可能会慢于RDB。一般情况下，每秒fsync的性能依然非常高，而关闭fsync可以让AOF的速度和RDB一样快，即使在高负荷之下也是如此。不过在处理巨大的写入时，RDB可以提供更有保证的最大延迟时间</li>
+</ul>
+<h3 id="AOF设置"><a href="#AOF设置" class="headerlink" title="AOF设置"></a>AOF设置</h3><p>redis.conf 配置aof</p>
+<figure class="highlight coffeescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">######</span><span class="comment">######</span><span class="comment">######</span><span class="comment">######</span><span class="comment">######</span> APPEND ONLY MODE <span class="comment">######</span><span class="comment">######</span><span class="comment">######</span><span class="comment">######</span><span class="comment">######</span><span class="comment">#</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># By default Redis asynchronously dumps the dataset on disk. This mode is</span></span><br><span class="line"><span class="comment"># good enough in many applications, but an issue with the Redis process or</span></span><br><span class="line"><span class="comment"># a power outage may result into a few minutes of writes lost (depending on</span></span><br><span class="line"><span class="comment"># the configured save points).</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># The Append Only File is an alternative persistence mode that provides</span></span><br><span class="line"><span class="comment"># much better durability. For instance using the default data fsync policy</span></span><br><span class="line"><span class="comment"># (see later in the config file) Redis can lose just one second of writes in a</span></span><br><span class="line"><span class="comment"># dramatic event like a server power outage, or a single write if something</span></span><br><span class="line"><span class="comment"># wrong with the Redis process itself happens, but the operating system is</span></span><br><span class="line"><span class="comment"># still running correctly.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># AOF and RDB persistence can be enabled at the same time without problems.</span></span><br><span class="line"><span class="comment"># If the AOF is enabled on startup Redis will load the AOF, that is the file</span></span><br><span class="line"><span class="comment"># with the better durability guarantees.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Please check http://redis.io/topics/persistence for more information.</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 开启aof</span></span><br><span class="line">appendonly <span class="literal">no</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The name of the append only file (default: "appendonly.aof")</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># aof文件名</span></span><br><span class="line">appendfilename <span class="string">"appendonly.aof"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># The fsync() call tells the Operating System to actually write data on disk</span></span><br><span class="line"><span class="comment"># instead of waiting for more data in the output buffer. Some OS will really flush</span></span><br><span class="line"><span class="comment"># data on disk, some other OS will just try to do it ASAP.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Redis supports three different modes:</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># no: don't fsync, just let the OS flush the data when it wants. Faster.</span></span><br><span class="line"><span class="comment"># always: fsync after every write to the append only log. Slow, Safest.</span></span><br><span class="line"><span class="comment"># everysec: fsync only one time every second. Compromise.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># The default is "everysec", as that's usually the right compromise between</span></span><br><span class="line"><span class="comment"># speed and data safety. It's up to you to understand if you can relax this to</span></span><br><span class="line"><span class="comment"># "no" that will let the operating system flush the output buffer when</span></span><br><span class="line"><span class="comment"># it wants, for better performances (but if you can live with the idea of</span></span><br><span class="line"><span class="comment"># some data loss consider the default persistence mode that's snapshotting),</span></span><br><span class="line"><span class="comment"># or on the contrary, use "always" that's very slow but a bit safer than</span></span><br><span class="line"><span class="comment"># everysec.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># More details please check the following article:</span></span><br><span class="line"><span class="comment"># http://antirez.com/post/redis-persistence-demystified.html</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># If unsure, use "everysec".</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 写命令时执行fsync</span></span><br><span class="line"><span class="comment"># appendfsync always</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 每秒执行fsync</span></span><br><span class="line">appendfsync everysec</span><br><span class="line"></span><br><span class="line"><span class="comment">#依赖操作系统，每30秒fsync</span></span><br><span class="line"><span class="comment"># appendfsync no</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># When the AOF fsync policy is set to always or everysec, and a background</span></span><br><span class="line"><span class="comment"># saving process (a background save or AOF log background rewriting) is</span></span><br><span class="line"><span class="comment"># performing a lot of I/O against the disk, in some Linux configurations</span></span><br><span class="line"><span class="comment"># Redis may block too long on the fsync() call. Note that there is no fix for</span></span><br><span class="line"><span class="comment"># this currently, as even performing fsync in a different thread will block</span></span><br><span class="line"><span class="comment"># our synchronous write(2) call.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># In order to mitigate this problem it's possible to use the following option</span></span><br><span class="line"><span class="comment"># that will prevent fsync() from being called in the main process while a</span></span><br><span class="line"><span class="comment"># BGSAVE or BGREWRITEAOF is in progress.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># This means that while another child is saving, the durability of Redis is</span></span><br><span class="line"><span class="comment"># the same as "appendfsync none". In practical terms, this means that it is</span></span><br><span class="line"><span class="comment"># possible to lose up to 30 seconds of log in the worst scenario (with the</span></span><br><span class="line"><span class="comment"># default Linux settings).</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># If you have latency problems turn this to "yes". Otherwise leave it as</span></span><br><span class="line"><span class="comment"># "no" that is the safest pick from the point of view of durability.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#在日志重写时，不进行命令追加操作，而只是将其放在缓冲区里，避免与命令的追加造成DISK IO上的冲突。  </span></span><br><span class="line"><span class="comment">#设置为yes表示rewrite期间对新写操作不fsync,暂时存在内存中,等rewrite完成后再写入，默认为no  </span></span><br><span class="line"><span class="literal">no</span>-appendfsync-<span class="literal">on</span>-rewrite <span class="literal">no</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># Automatic rewrite of the append only file.</span></span><br><span class="line"><span class="comment"># Redis is able to automatically rewrite the log file implicitly calling</span></span><br><span class="line"><span class="comment"># BGREWRITEAOF when the AOF log size grows by the specified percentage.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># This is how it works: Redis remembers the size of the AOF file after the</span></span><br><span class="line"><span class="comment"># latest rewrite (if no rewrite has happened since the restart, the size of</span></span><br><span class="line"><span class="comment"># the AOF at startup is used).</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># This base size is compared to the current size. If the current size is</span></span><br><span class="line"><span class="comment"># bigger than the specified percentage, the rewrite is triggered. Also</span></span><br><span class="line"><span class="comment"># you need to specify a minimal size for the AOF file to be rewritten, this</span></span><br><span class="line"><span class="comment"># is useful to avoid rewriting the AOF file even if the percentage increase</span></span><br><span class="line"><span class="comment"># is reached but it is still pretty small.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Specify a percentage of zero in order to disable the automatic AOF</span></span><br><span class="line"><span class="comment"># rewrite feature.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#当前AOF文件大小是上次日志重写得到AOF文件大小的二倍时，自动启动新的日志重写过程。  </span></span><br><span class="line">auto-aof-rewrite-percentage <span class="number">100</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#当前AOF文件启动新的日志重写过程的最小值，避免刚刚启动Reids时由于文件尺寸较小导致频繁的重写。  </span></span><br><span class="line">auto-aof-rewrite-min-size <span class="number">64</span>mb</span><br><span class="line"></span><br><span class="line"><span class="comment"># An AOF file may be found to be truncated at the end during the Redis</span></span><br><span class="line"><span class="comment"># startup process, when the AOF data gets loaded back into memory.</span></span><br><span class="line"><span class="comment"># This may happen when the system where Redis is running</span></span><br><span class="line"><span class="comment"># crashes, especially when an ext4 filesystem is mounted without the</span></span><br><span class="line"><span class="comment"># data=ordered option (however this can't happen when Redis itself</span></span><br><span class="line"><span class="comment"># crashes or aborts but the operating system still works correctly).</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Redis can either exit with an error when this happens, or load as much</span></span><br><span class="line"><span class="comment"># data as possible (the default now) and start if the AOF file is found</span></span><br><span class="line"><span class="comment"># to be truncated at the end. The following option controls this behavior.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># If aof-load-truncated is set to yes, a truncated AOF file is loaded and</span></span><br><span class="line"><span class="comment"># the Redis server starts emitting a log to inform the user of the event.</span></span><br><span class="line"><span class="comment"># Otherwise if the option is set to no, the server aborts with an error</span></span><br><span class="line"><span class="comment"># and refuses to start. When the option is set to no, the user requires</span></span><br><span class="line"><span class="comment"># to fix the AOF file using the "redis-check-aof" utility before to restart</span></span><br><span class="line"><span class="comment"># the server.</span></span><br><span class="line"><span class="comment">#</span></span><br><span class="line"><span class="comment"># Note that if the AOF file will be found to be corrupted in the middle</span></span><br><span class="line"><span class="comment"># the server will still exit with an error. This option only applies when</span></span><br><span class="line"><span class="comment"># Redis will try to read more data from the AOF file but not enough bytes</span></span><br><span class="line"><span class="comment"># will be found.</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#Redis启动加载aof文件，如果发现末尾命令不完整则自动截掉，成功加载前面正确的数据。如果设置为no，遇到此类情况，Redis启动失败，用redis-check-aof 工具手工修复。</span></span><br><span class="line">aof-load-truncated <span class="literal">yes</span></span><br></pre></td></tr></table></figure>
+
       
 
       
@@ -174,7 +189,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Redis</a>
         		</li>
       		
 		</ul>
@@ -183,16 +198,75 @@
       
 
       
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/01/25/jsonReader/">展开全文 >></a>
-        </p>
-      
 
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/02/22/redis-aof/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
       
       <div class="clearfix"></div>
     </div>
   </div>
 </article>
+
+  
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2018/02/20/redis-rdb/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">redis持久化之RDB</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
 
 <aside class="wrap-side-operation">
     <div class="mod-side-operation">
@@ -212,209 +286,30 @@
 
 
 
-
-  
-    <article id="post-15166108339904" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/01/22/15166108339904/">scp</a>
-    </h1>
-  
-
-        
-        <a href="/blog/2018/01/22/15166108339904/" class="archive-article-date">
-  	<time datetime="2018-01-22T08:47:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="media/15166108339904/15166303162584.jpg" alt=""></p>
-<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我们经常会需要本机与服务器之间进行传输文件，以前用windows时用xshell里面有ftp直接拖就行了，现在转到mac，还没有找到一好的工具来满足这方面的需求，只能靠命令来解决了。</p>
-<h2 id="scp"><a href="#scp" class="headerlink" title="scp"></a>scp</h2><p>scp是secure copy的简写，用于在Linux下进行远程拷贝文件的命令，和它类似的命令有cp，不过cp只是在本机进行拷贝不能跨服务器，而且scp传输是加密的。可能会稍微影响一下速度。当你服务器硬盘变为只读 read only system时，用scp可以帮你把文件移出来。另外，scp还非常不占资源，不会提高多少系统负荷，在这一点上，rsync就远远不及它了。虽然 rsync比scp会快一点，但当小文件众多的情况下，rsync会导致硬盘I/O非常高，而scp基本不影响系统正常使用。</p>
-<p>1．命令格式：</p>
-<p>scp [参数] [原路径] [目标路径]</p>
-<p>2．命令功能：</p>
-<p>scp是 secure copy的缩写, scp是linux系统下基于ssh登陆进行安全的远程文件拷贝命令。linux的scp命令可以在linux服务器之间复制文件和目录。</p>
-<p>3．命令参数：</p>
-<p>-1  强制scp命令使用协议ssh1  </p>
-<p>-2  强制scp命令使用协议ssh2  </p>
-<p>-4  强制scp命令只使用IPv4寻址  </p>
-<p>-6  强制scp命令只使用IPv6寻址  </p>
-<p>-B  使用批处理模式（传输过程中不询问传输口令或短语）  </p>
-<p>-C  允许压缩。（将-C标志传递给ssh，从而打开压缩功能）  </p>
-<p>-p 保留原文件的修改时间，访问时间和访问权限。  </p>
-<p>-q  不显示传输进度条。  </p>
-<p>-r  递归复制整个目录。  </p>
-<p>-v 详细方式显示输出。scp和ssh(1)会显示出整个过程的调试信息。这些信息用于调试连接，验证和配置问题。   </p>
-<p>-c cipher  以cipher将数据传输进行加密，这个选项将直接传递给ssh。   </p>
-<p>-F ssh_config  指定一个替代的ssh配置文件，此参数直接传递给ssh。  </p>
-<p>-i identity_file  从指定文件中读取传输时使用的密钥文件，此参数直接传递给ssh。    </p>
-<p>-l limit  限定用户所能使用的带宽，以Kbit/s为单位。     </p>
-<p>-o ssh_option  如果习惯于使用ssh_config(5)中的参数传递方式，   </p>
-<p>-P port  注意是大写的P, port是指定数据传输用到的端口号   </p>
-<p>-S program  指定加密传输时所使用的程序。此程序必须能够理解ssh(1)的选项。</p>
-<h3 id="本地文件至服务器"><a href="#本地文件至服务器" class="headerlink" title="本地文件至服务器"></a>本地文件至服务器</h3><p>(1) 复制文件：</p>
-<p>比如我mac上有个btrace的包（/Applications/devTools/btrace/btrace-bin-1.3.9.tgz）要传输至服务器172.16.80.63的/home/admin/scripts的目录上，并且我们知道172.16.80.63服务器上的一个用户名与密码 admin/E3rFi4E8yUOR1QT78Ip7ug<br>命令如下：<br>scp /Applications/devTools/btrace/btrace-bin-1.3.9.tgz admin@172.16.80.63:/home/admin/scripts</p>
-<p>再输入密码即可传输完成。<br><img src="media/15166108339904/15166119829462.jpg" alt=""></p>
-<p>(1) 复制目录：<br>同上，现在mac上有个btrace的目录要复制至上述的目录中</p>
-<p>命令如下：<br>scp -r /Applications/devTools/btrace/btrace-bin-1.3.9 admin@172.16.80.63:/home/admin/scripts</p>
-<p>再输入密码完成<br><img src="media/15166108339904/15166122522556.jpg" alt=""></p>
-<h3 id="服务器文件至本地"><a href="#服务器文件至本地" class="headerlink" title="服务器文件至本地"></a>服务器文件至本地</h3><p>服务器文件至本地与本地文件至服务器的方式差不多，只不过把命令后面的两个参数调换一下。直接看命令：<br>scp admin@172.16.80.63:/home/admin/scripts/clean_log.sh /Users/peanuthuang/Desktop</p>
-<p>再输入密码完成把clean_log.sh脚本复制至本地desktop文件目录内。</p>
-<p><img src="media/15166108339904/15166126587594.jpg" alt=""></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">命令</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/01/22/15166108339904/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="post-15165864139104" class="article article-type-post  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/01/22/15165864139104/">btrace 初使用</a>
-    </h1>
-  
-
-        
-        <a href="/blog/2018/01/22/15165864139104/" class="archive-article-date">
-  	<time datetime="2018-01-22T02:00:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="media/15165864139104/15166718966733.jpg" alt=""></p>
-<p>btrace 是一种线上代码诊断工具。有时候线上出现的问题无法在测试环境中重现，而这些未知的问题可以通过方法调用的参数来确定，这时就可以使用btrace来定位方法的入参等一些信息。<a href="https://github.com/btraceio/btrace" target="_blank" rel="noopener">btrace github</a> 下载zip解压即可用。</p>
-<p><img src="media/15165864139104/15166093373737.jpg" alt=""></p>
-<p>编写btrace 脚本代码，例如：</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.annotations</span><span class="selector-class">.BTrace</span>;</span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.annotations</span><span class="selector-class">.OnMethod</span>;</span><br><span class="line"></span><br><span class="line"><span class="selector-tag">import</span> <span class="selector-tag">static</span> <span class="selector-tag">com</span><span class="selector-class">.sun</span><span class="selector-class">.btrace</span><span class="selector-class">.BTraceUtils</span><span class="selector-class">.println</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author peanut.huang</span></span><br><span class="line"><span class="comment"> * @date 2018/1/22.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line">@<span class="keyword">BTrace</span></span><br><span class="line"><span class="keyword">public</span> class DetailDemo &#123;</span><br><span class="line"></span><br><span class="line">    @<span class="keyword">OnMethod</span>(<span class="keyword">clazz</span>="<span class="keyword">com</span>.<span class="keyword">qiho</span>.<span class="keyword">web</span>.<span class="keyword">deploy</span>.<span class="keyword">controller</span>.<span class="keyword">ItemDetailsController</span>", method=<span class="string">"detail"</span>)</span><br><span class="line">    public static void detail(Long id, Long skinId, String a_cid) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">id</span>);</span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">skinId</span>);</span><br><span class="line">        <span class="selector-tag">println</span>(<span class="selector-tag">a_cid</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><img src="media/15165864139104/15166102883966.jpg" alt=""><br>执行：</p>
-<ol>
-<li>找到当前应用进程号</li>
-<li>执行脚本<br>因为我本机已经把btrace 命令加入了环境变量可以直接执行， <code>btrace pid 脚本类</code>。当页面访问时即可以控制台打印出对应的参数<br><img src="media/15165864139104/15166104855411.jpg" alt=""></li>
-</ol>
-<p>现在我们知道了，ItemDetailsController的detail方法发生了调用，入参id=81,skinId=1</p>
-<p>或者将结果输出至文件内：<br><code>[admin@test-baiqi bin]$ ./btrace 963 ../scripts/DetailDemo.java &gt; ../scripts/logs/result.log</code></p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>江南白衣大神的<a href="http://calvin1978.blogcn.com/articles/btrace1.html" target="_blank" rel="noopener">Btrace入门到熟练小工完全指南</a></p>
-
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">工具</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/01/22/15165864139104/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
   
   
-    <nav id="page-nav">
-      <a class="extend prev" rel="prev" href="/blog/">&laquo; Prev</a><a class="page-number" href="/blog/">1</a><span class="page-number current">2</span>
-    </nav>
+  
+
+  
+
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '{{page.articleID}}',
+  owner: 'peanuts0',
+  repo: 'blog',
+  oauth: {
+    client_id: '17716911d1143cda96e6',
+    client_secret: '9be9112ba195381de296db28a6eda05903c65d16',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
   
 
 
@@ -437,8 +332,8 @@
     <script>
 	var yiliaConfig = {
 		mathjax: false,
-		isHome: true,
-		isPost: false,
+		isHome: false,
+		isPost: true,
 		isArchive: false,
 		isTag: false,
 		isCategory: false,

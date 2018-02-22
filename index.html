@@ -131,6 +131,83 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="pages-redis-aof" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2018/02/22/redis-aof/">redis 持久化之AOF</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2018/02/22/redis-aof/" class="archive-article-date">
+  	<time datetime="2018-02-22T07:20:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://p33uh193a.bkt.clouddn.com/redis.jpeg" alt=""></p>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>继续上篇的<a href="https://peanuts0.github.io/blog/2018/02/20/redis-rdb/#more" target="_blank" rel="noopener">RDB</a>介绍，这篇我们介绍一下AOF(append only file)的持久化方式。不同于RDB的周期性快照备份，AOF则是每收到一个写命令都会通过write()系统函数追加到aof文件中，类似于mysql的binlog。</p>
+        
+          <a class="article-more-a" href="/blog/2018/02/22/redis-aof/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Redis</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2018/02/22/redis-aof/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="pages-redis-rdb" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -675,89 +752,6 @@
       
         <p class="article-more-link">
           <a class="article-more-a" href="/blog/2018/02/01/guava-cache/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
-    <article id="pages-jsonReader" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/01/25/jsonReader/">json文件导入</a>
-    </h1>
-  
-
-        
-        <a href="/blog/2018/01/25/jsonReader/" class="archive-article-date">
-  	<time datetime="2018-01-25T05:53:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-25</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>现在有一个全国省市区数据的json文件数据要导入数据库</p>
-<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>最简单的办法就是把这些json字符串放入一个String中，然后再用fastJson等类库，把String转换成对应的对象，再作其他入库处理。 这个有个问题就是String的大小容量问题</p>
-<h5 id="放-String为何不合适"><a href="#放-String为何不合适" class="headerlink" title="放 String为何不合适"></a>放 String为何不合适</h5><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/** <span class="type">The</span> <span class="keyword">value</span> is used <span class="keyword">for</span> character storage. */</span><br><span class="line">    <span class="keyword">private</span> final <span class="built_in">char</span> <span class="keyword">value</span><span class="literal">[]</span>;</span><br></pre></td></tr></table></figure>
-<p>String 的数据其实都是放在了这个final的字符数组中，那么其长度限制就是Integer.MAX_VALUE 也就是2^31 - 1 = 2147483647 。那么如果这个vaue[]<br>占满了，要耗费多少内存呢？</p>
-<p>这个我们插入一个知识点：</p>
-<blockquote>
-<p>字节：byte<br>    位：bit<br>    字符：char<br>    一个字节占8位，也就是1 byte = 8 bit<br>    一个字符占16位，也就是1 char = 16 bit = 2 byte<br>    1KB = 1024 byte<br>    1MB = 1024 KB<br>    1GB = 1024 MB<br>    1TB = 1024 GB</p>
-</blockquote>
-        
-          <a class="article-more-a" href="/blog/2018/01/25/jsonReader/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/01/25/jsonReader/">展开全文 >></a>
         </p>
       
 
