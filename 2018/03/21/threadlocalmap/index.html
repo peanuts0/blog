@@ -6,18 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>Tag: 多线程 | 花生的博客</title>
+  <title>ThreadLocal | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="坐标杭州，二流程序员">
-<meta name="keywords" content="后端，linux，java，spring，分布式，python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="花生的博客">
-<meta property="og:url" content="//peanuts0.github.io/tags/多线程/index.html">
+  <meta name="description" content="问题我们知道可以用ThreadLocal来存储线程间隔离的数据，其原理是Thread类中有个ThreadLocalMap的属性 ThreadLocal.ThreadLocalMap threadLocals = null 来存储属于当前线程的数据，需求注意的是：每次使用完ThreadLocal都需要对其进行remove以防内存泄漏，例如在filter过滤器中的运用:">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ThreadLocal">
+<meta property="og:url" content="//peanuts0.github.io/2018/03/21/threadlocalmap/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="坐标杭州，二流程序员">
+<meta property="og:description" content="问题我们知道可以用ThreadLocal来存储线程间隔离的数据，其原理是Thread类中有个ThreadLocalMap的属性 ThreadLocal.ThreadLocalMap threadLocals = null 来存储属于当前线程的数据，需求注意的是：每次使用完ThreadLocal都需要对其进行remove以防内存泄漏，例如在filter过滤器中的运用:">
+<meta property="og:updated_time" content="2018-03-21T08:53:43.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="花生的博客">
-<meta name="twitter:description" content="坐标杭州，二流程序员">
+<meta name="twitter:title" content="ThreadLocal">
+<meta name="twitter:description" content="问题我们知道可以用ThreadLocal来存储线程间隔离的数据，其原理是Thread类中有个ThreadLocalMap的属性 ThreadLocal.ThreadLocalMap threadLocals = null 来存储属于当前线程的数据，需求注意的是：每次使用完ThreadLocal都需要对其进行remove以防内存泄漏，例如在filter过滤器中的运用:">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -129,36 +130,64 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="pages-threadlocalmap" class="article article-type-pages " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      ThreadLocal
+    </h1>
+  
+
+        
+        <a href="/blog/2018/03/21/threadlocalmap/" class="archive-article-date">
+  	<time datetime="2018-03-21T05:49:32.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-21</time>
+</a>
+        
+      </header>
     
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h3><p>我们知道可以用ThreadLocal来存储线程间隔离的数据，其原理是Thread类中有个ThreadLocalMap的属性 <code>ThreadLocal.ThreadLocalMap threadLocals = null</code> 来存储属于当前线程的数据，需求注意的是：每次使用完ThreadLocal都需要对其进行remove以防内存泄漏，例如在filter过滤器中的运用:</p>
+<a id="more"></a>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">XXRequestLocal</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> ThreadLocal&lt;XXRequestLocal&gt; local = <span class="keyword">new</span> ThreadLocal&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> HttpServletRequest request;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 获取线程变量</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * @return RequestLocal</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> XXRequestLocal <span class="title">get</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        XXRequestLocal rl = local.<span class="keyword">get</span>();</span><br><span class="line">        <span class="keyword">if</span> (rl == <span class="literal">null</span>) &#123;</span><br><span class="line">            rl = <span class="keyword">new</span> XXRequestLocal();</span><br><span class="line">            local.<span class="keyword">set</span>(rl);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> rl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 从RequestLocal中移除本测请求线程变量</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">clear</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        local.<span class="keyword">set</span>(<span class="literal">null</span>);</span><br><span class="line">        local.<span class="keyword">remove</span>();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> HttpServletRequest <span class="title">getRequest</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> request;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setRequest</span>(<span class="params">HttpServletRequest request</span>) </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.request = request;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doFilter</span>(<span class="params">ServletRequest req, ServletResponse resp, FilterChain chain</span>) throws IOException, ServletException </span>&#123;</span><br><span class="line">        HttpServletRequest request = (HttpServletRequest) req;</span><br><span class="line">        HttpServletResponse response = (HttpServletResponse) resp;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//当前请求设置进ThreadLocal</span></span><br><span class="line">        XXRequestLocal.<span class="keyword">get</span>().setRequest(request);</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// do something ...</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception ex) &#123;</span><br><span class="line">            LOGGER.error(<span class="string">""</span>,ex); </span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            XXRequestLocal.clear();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>当我们在某些service中需求request请求中的数据时即可这么用：</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">HttpServletRequest request</span> = XXRequestLocal.get().getRequest();</span><br></pre></td></tr></table></figure>
+<p>那我们思考为什么使用完后要调用remove方法呢？ 它是怎么解决内存泄漏的？ ThreadLocal又是怎么内存泄漏的呢？</p>
+<h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>从上述运用代码可以看出我们在ThreadLocal中存了一个XXRequestLocal的实例，该实例再关联了一些我们需求的属性(比如：request)。</p>
+<h4 id="get"><a href="#get" class="headerlink" title="get"></a>get</h4><figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> T <span class="keyword">get</span>() &#123;</span><br><span class="line">   Thread t = Thread.currentThread();</span><br><span class="line">   ThreadLocalMap map = getMap(t);</span><br><span class="line">   <span class="keyword">if</span> (map != <span class="literal">null</span>) &#123;</span><br><span class="line">       ThreadLocalMap.Entry e = map.getEntry(<span class="keyword">this</span>);</span><br><span class="line">       <span class="keyword">if</span> (e != <span class="literal">null</span>) &#123;</span><br><span class="line">           <span class="meta">@SuppressWarnings(<span class="meta-string">"unchecked"</span>)</span></span><br><span class="line">           T result = (T)e.value;</span><br><span class="line">           <span class="keyword">return</span> result;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> setInitialValue();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* Variant of set() to establish initialValue. Used instead</span></span><br><span class="line"><span class="comment">* of set() in case user has overridden the set() method.</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">* <span class="doctag">@return</span> the initial value</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">private</span> T setInitialValue() &#123;</span><br><span class="line">   T value = initialValue();</span><br><span class="line">   Thread t = Thread.currentThread();</span><br><span class="line">   ThreadLocalMap map = getMap(t);</span><br><span class="line">   <span class="keyword">if</span> (map != <span class="literal">null</span>)</span><br><span class="line">       map.<span class="keyword">set</span>(<span class="keyword">this</span>, value);</span><br><span class="line">   <span class="keyword">else</span></span><br><span class="line">       createMap(t, value);</span><br><span class="line">   <span class="keyword">return</span> value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过当前线程获取map</li>
+<li>通过当threadlocal 实例获取entry 并返回value</li>
+<li>如果map不存在可以通过initialValue方法返回默认值。也就是可以通覆盖initialValue()给线程内的局部变量一个默认的初始化值。</li>
+</ul>
+<h4 id="set"><a href="#set" class="headerlink" title="set"></a>set</h4><p>我们再看看ThreadLocal的set方法</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">set</span>(<span class="params">T <span class="keyword">value</span></span>) </span>&#123;</span><br><span class="line">   Thread t = Thread.currentThread();</span><br><span class="line">   ThreadLocalMap map = getMap(t);</span><br><span class="line">   <span class="keyword">if</span> (map != <span class="literal">null</span>)</span><br><span class="line">       map.<span class="keyword">set</span>(<span class="keyword">this</span>, <span class="keyword">value</span>);</span><br><span class="line">   <span class="keyword">else</span></span><br><span class="line">       createMap(t, <span class="keyword">value</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">ThreadLocalMap <span class="title">getMap</span>(<span class="params">Thread t</span>) </span>&#123;</span><br><span class="line">   <span class="keyword">return</span> t.threadLocals;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">createMap</span>(<span class="params">Thread t, T firstValue</span>) </span>&#123;</span><br><span class="line">   t.threadLocals = <span class="keyword">new</span> ThreadLocalMap(<span class="keyword">this</span>, firstValue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>获取当前线程，通过当前线程去得到ThreadLocalMap的实例，如果实例不存在，则创建实例。并且将当前ThreadLocal的实例为key，具体的值为value，设置于ThreadLocalMap。</p>
+<p>ThreadLocalMap是类似于HashMap的结构，采用数组加链表的方式存储。不同于HashMap的是其链表Entry 继承了 WeakReference</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">static <span class="class"><span class="keyword">class</span> <span class="title">Entry</span> <span class="keyword">extends</span> <span class="title">WeakReference&lt;ThreadLocal&lt;?&gt;&gt;</span> </span>&#123;</span><br><span class="line">  <span class="comment">/** The value associated with this ThreadLocal. */</span></span><br><span class="line">  <span class="type">Object</span> value;</span><br><span class="line"></span><br><span class="line">  <span class="type">Entry</span>(<span class="type">ThreadLocal</span>&lt;?&gt; k, <span class="type">Object</span> v) &#123;</span><br><span class="line">      <span class="keyword">super</span>(k);</span><br><span class="line">      value = v;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们知道Java的引用类型有：强，软，弱，虚引用，各种类型引用在GC时有不同的表现。对于一个对象是否要被GC回收，要看发生GC时这个对象是否与根索引之间有可通达的路径。比如</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Object</span> a = <span class="keyword">new</span> <span class="built_in">Object</span>();</span><br></pre></td></tr></table></figure>
+<p>上述中创建了一个强引用a，只要强引用存在，GC就不会回收Object对象。而对于弱引用：</p>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">WeakReference&lt;<span class="built_in">Object</span>&gt; <span class="built_in">object</span> = <span class="keyword">new</span> WeakReference&lt;&gt;(<span class="keyword">new</span> <span class="built_in">Object</span>());</span><br></pre></td></tr></table></figure>
+<p>只要没有强引用指向Object对象，GC运行时都会自动的将其回收。</p>
+<p>那么，ThreadLocalMap中的key使用弱引用也是这个原因，当一条线程中的ThreadLocal对象使用完毕，没有强引用指向它时，GC可以自动回收这个key，从而达到节约内存的目的。</p>
+<h4 id="内存泄漏问题"><a href="#内存泄漏问题" class="headerlink" title="内存泄漏问题"></a>内存泄漏问题</h4><p>在ThreadLocalMap中，只有key是弱引用，value仍然是一个强引用。当某一条线程中的ThreadLocal使用完毕，没有强引用指向它的时候，这个key指向的对象就会被垃圾收集器回收，从而这个key就变成了null；然而，此时value和value指向的对象之间仍然是强引用关系，只要这种关系不解除，value指向的对象永远不会被垃圾收集器回收，从而导致内存泄漏！</p>
+<p>不过不用担心，ThreadLocal提供了这个问题的解决方案。</p>
+<p>每次操作set、get、remove操作时，ThreadLocal都会将key为null的Entry删除，从而避免内存泄漏。</p>
+<figure class="highlight gauss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">private int expungeStaleEntry(int staleSlot) &#123;</span><br><span class="line">            Entry[] <span class="built_in">tab</span> = table;</span><br><span class="line">            int len = <span class="built_in">tab</span>.length;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// expunge entry at staleSlot</span></span><br><span class="line">            <span class="built_in">tab</span>[staleSlot].value = <span class="built_in">null</span>;</span><br><span class="line">            <span class="built_in">tab</span>[staleSlot] = <span class="built_in">null</span>;</span><br><span class="line">            size--;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Rehash until we encounter null</span></span><br><span class="line">            Entry e;</span><br><span class="line">            int i;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="built_in">nextIndex</span>(staleSlot, len);</span><br><span class="line">                 (e = <span class="built_in">tab</span>[i]) != <span class="built_in">null</span>;</span><br><span class="line">                 i = <span class="built_in">nextIndex</span>(i, len)) &#123;</span><br><span class="line">                ThreadLocal&lt;?&gt; k = e.get();</span><br><span class="line">                <span class="keyword">if</span> (k == <span class="built_in">null</span>) &#123;</span><br><span class="line">                    e.value = <span class="built_in">null</span>;</span><br><span class="line">                    <span class="built_in">tab</span>[i] = <span class="built_in">null</span>;</span><br><span class="line">                    size--;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    int h = k.threadLocalHashCode &amp; (len - <span class="number">1</span>);</span><br><span class="line">                    <span class="keyword">if</span> (h != i) &#123;</span><br><span class="line">                        <span class="built_in">tab</span>[i] = <span class="built_in">null</span>;</span><br><span class="line"></span><br><span class="line">                        <span class="comment">// Unlike Knuth 6.4 Algorithm R, we must scan until</span></span><br><span class="line">                        <span class="comment">// null because multiple entries could have been stale.</span></span><br><span class="line">                        <span class="keyword">while</span> (<span class="built_in">tab</span>[h] != <span class="built_in">null</span>)</span><br><span class="line">                            h = <span class="built_in">nextIndex</span>(h, len);</span><br><span class="line">                        <span class="built_in">tab</span>[h] = e;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> i;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+<p>那么问题又来了，如果一个线程运行周期较长，而且将一个大对象放入LocalThreadMap后便不再调用set、get、remove方法，此时该仍然可能会导致内存泄漏。</p>
+<p>这个问题确实存在，没办法通过ThreadLocal解决，而是需要程序员在完成ThreadLocal的使用后要养成手动调用remove的习惯，从而避免内存泄漏。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
       
       
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/blog/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/07/cas/" class="archive-article-date">
-  	<time datetime="2018-02-07T07:39:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-07</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/07/cas/">CAS的一点理解</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -166,153 +195,126 @@
         		<li class="article-tag-list-item">
         			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
         		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/03/21/threadlocalmap/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/05/CyclicBarrier/" class="archive-article-date">
-  	<time datetime="2018-02-05T09:26:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-05</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2018/03/14/interview/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">spring解决bean循环依赖</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/05/CyclicBarrier/">CyclicBarrier 详解</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/02/countdownlatch/" class="archive-article-date">
-  	<time datetime="2018-02-02T06:09:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/02/countdownlatch/">CountDownLatch 详解</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/01/线程状态流转/" class="archive-article-date">
-  	<time datetime="2018-02-01T10:40:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-01</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/01/线程状态流转/">java线程状态流转</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '{{page.articleID}}',
+  owner: 'peanuts0',
+  repo: 'blog',
+  oauth: {
+    client_id: '17716911d1143cda96e6',
+    client_secret: '9be9112ba195381de296db28a6eda05903c65d16',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
   
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -335,9 +337,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
