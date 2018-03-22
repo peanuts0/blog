@@ -6,18 +6,23 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>Tag: Redis | 花生的博客</title>
+  <title>限流小解 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="坐标杭州，二流程序员">
-<meta name="keywords" content="后端，linux，java，spring，分布式，python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="花生的博客">
-<meta property="og:url" content="//peanuts0.github.io/tags/Redis/index.html">
+  <meta name="description" content="介绍在高并发系统下有三把利器用来保护系统：缓存，降级，限流。缓存的目的是提升系统的响应速度和增大系统处理容量，降级是当部分服务出现问题影响核心功能时，需要将其暂时屏蔽掉，待高峰过后或问题解决后再打开，而有些类似秒杀，抢购等场景并不能用缓存和降级来解决，需要有一种手段来控制有限的请求量或者并发数，那就是限流。">
+<meta name="keywords" content="架构">
+<meta property="og:type" content="article">
+<meta property="og:title" content="限流小解">
+<meta property="og:url" content="//peanuts0.github.io/2018/03/21/limit/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="坐标杭州，二流程序员">
+<meta property="og:description" content="介绍在高并发系统下有三把利器用来保护系统：缓存，降级，限流。缓存的目的是提升系统的响应速度和增大系统处理容量，降级是当部分服务出现问题影响核心功能时，需要将其暂时屏蔽掉，待高峰过后或问题解决后再打开，而有些类似秒杀，抢购等场景并不能用缓存和降级来解决，需要有一种手段来控制有限的请求量或者并发数，那就是限流。">
+<meta property="og:image" content="http://image.woshipm.com/wp-files/2014/09/%E5%8D%9A%E5%AE%A2%E6%B5%81%E9%87%8F5%E5%A6%99%E6%8B%9B.jpg">
+<meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/order-bucket.png">
+<meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/e/e1/LeakyBucket.png">
+<meta property="og:updated_time" content="2018-03-22T06:54:37.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="花生的博客">
-<meta name="twitter:description" content="坐标杭州，二流程序员">
+<meta name="twitter:title" content="限流小解">
+<meta name="twitter:description" content="介绍在高并发系统下有三把利器用来保护系统：缓存，降级，限流。缓存的目的是提升系统的响应速度和增大系统处理容量，降级是当部分服务出现问题影响核心功能时，需要将其暂时屏蔽掉，待高峰过后或问题解决后再打开，而有些类似秒杀，抢购等场景并不能用缓存和降级来解决，需要有一种手段来控制有限的请求量或者并发数，那就是限流。">
+<meta name="twitter:image" content="http://image.woshipm.com/wp-files/2014/09/%E5%8D%9A%E5%AE%A2%E6%B5%81%E9%87%8F5%E5%A6%99%E6%8B%9B.jpg">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -129,98 +134,177 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="pages-limit" class="article article-type-pages " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/blog/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/22/redis-aof/" class="archive-article-date">
-  	<time datetime="2018-02-22T07:20:31.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-22</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/22/redis-aof/">redis 持久化之AOF</a>
+    <h1 class="article-title" itemprop="name">
+      限流小解
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/blog/2018/03/21/limit/" class="archive-article-date">
+  	<time datetime="2018-03-21T13:03:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-21</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="http://image.woshipm.com/wp-files/2014/09/%E5%8D%9A%E5%AE%A2%E6%B5%81%E9%87%8F5%E5%A6%99%E6%8B%9B.jpg" alt=""></p>
+<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>在高并发系统下有三把利器用来保护系统：缓存，降级，限流。缓存的目的是提升系统的响应速度和增大系统处理容量，降级是当部分服务出现问题影响核心功能时，需要将其暂时屏蔽掉，待高峰过后或问题解决后再打开，而有些类似秒杀，抢购等场景并不能用缓存和降级来解决，需要有一种手段来控制有限的请求量或者并发数，那就是限流。</p>
+<a id="more"></a>
+<p>一般高并发系统常见的限流有：限制总并发数（比如数据库连接池，线程池）、限制瞬时并发数（如nginx的limit_conn模块，用来限制瞬时并发连接数）、限制时间窗口内的平均速率（如Guava的RateLimiter、nginx的limit_req模块，限制每秒的平均速率）;其他还有如限制远程接口调用速率，限制MQ的消费速率等。</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>常见的限流方法有：令牌桶，漏桶。计数器也可以进行粗暴限流实现。</p>
+<h4 id="令牌桶算法"><a href="#令牌桶算法" class="headerlink" title="令牌桶算法"></a>令牌桶算法</h4><p>令牌桶算法是一个存放固定容量令牌的桶，按照一定的速率往桶里放入令牌，只有获取了一定数量令牌的请求才可以被正常接收，未拿到令牌的请求将被丢弃或者阻塞。</p>
+<p><img src="http://p33uh193a.bkt.clouddn.com/order-bucket.png" alt=""></p>
+<h3 id="漏桶算法"><a href="#漏桶算法" class="headerlink" title="漏桶算法"></a>漏桶算法</h3><p>漏桶算法是一个固定容量的桶按固定的一定速率流出水滴，如果桶是空的，则不需流出水滴，可以是任意的速率流入水滴，如果桶容量已满，则流入的水滴被丢弃。<br><img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/LeakyBucket.png" alt=""></p>
+<h3 id="对比"><a href="#对比" class="headerlink" title="对比"></a>对比</h3><ul>
+<li>令牌桶是按照固定的速率往桶中添加令牌，请求是否被处理要看桶中的令牌是否充足，当无令牌时拒绝请求。</li>
+<li>漏桶是按照常量固定的速率流出请求，流入请求速率任意，当流入的请求数累积在桶容量时，新流入的请求被拒绝。</li>
+<li>令牌桶限制的是平均流入速率（允许突发请求，只要有令牌就可以处理，支持一次拿多个令牌），并允许一定程序的突发流量</li>
+<li>漏桶限制的是常量流出速率（即流出速率是一个固定常量值，比如都是1的速率流出，而不能一次是1，下次是2）,从而平滑突发流入速率</li>
+<li>令牌桶允许一定程度的突发，而漏桶主要目的是平滑流入速率</li>
+</ul>
+<p>另外有时候我们还使用计数器来进行限流，主要用来限制总并发数，比如数据库连接池，线程池，秒杀的并发数。只要全局总请求数或者一定时间段的总请求数设定的阈值进行限流，是简单粗暴的总数量限流，而不是平均速率限流。</p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Redis</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">架构</a>
         		</li>
       		
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/03/21/limit/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/20/redis-rdb/" class="archive-article-date">
-  	<time datetime="2018-02-20T07:43:45.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-20</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2018/03/21/common-properties/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">spring boot常用properties配置</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/20/redis-rdb/">redis持久化之RDB</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Redis</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '{{page.articleID}}',
+  owner: 'peanuts0',
+  repo: 'blog',
+  oauth: {
+    client_id: '17716911d1143cda96e6',
+    client_secret: '9be9112ba195381de296db28a6eda05903c65d16',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -243,9 +327,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
