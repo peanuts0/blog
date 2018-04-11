@@ -6,18 +6,21 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>Tag: 多线程 | 花生的博客</title>
+  <title>Future 小解 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="坐标杭州，二流程序员">
-<meta name="keywords" content="后端，linux，java，spring，分布式，python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="花生的博客">
-<meta property="og:url" content="//peanuts0.github.io/tags/多线程/index.html">
+  <meta name="description" content="FutureFuture是并发编程中一个重要的异步调用接口，它可以把多线程任务执行的结果通过异步的方式返回，通常我们可以这样做： 12345678ExecutorService executor = Executors.newSingleThreadExecutor();Future&amp;lt;String&amp;gt; future = executor.submit(() -&amp;gt; &quot;ok&quot;);tr">
+<meta name="keywords" content="Java,多线程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Future 小解">
+<meta property="og:url" content="//peanuts0.github.io/2018/03/29/future/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="坐标杭州，二流程序员">
+<meta property="og:description" content="FutureFuture是并发编程中一个重要的异步调用接口，它可以把多线程任务执行的结果通过异步的方式返回，通常我们可以这样做： 12345678ExecutorService executor = Executors.newSingleThreadExecutor();Future&amp;lt;String&amp;gt; future = executor.submit(() -&amp;gt; &quot;ok&quot;);tr">
+<meta property="og:image" content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7V_zaWkfeUtgDQZ3Q94uO_jYpaDRXxxrhCYZPlgv22ZaXHfCz">
+<meta property="og:updated_time" content="2018-04-10T08:54:02.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="花生的博客">
-<meta name="twitter:description" content="坐标杭州，二流程序员">
+<meta name="twitter:title" content="Future 小解">
+<meta name="twitter:description" content="FutureFuture是并发编程中一个重要的异步调用接口，它可以把多线程任务执行的结果通过异步的方式返回，通常我们可以这样做： 12345678ExecutorService executor = Executors.newSingleThreadExecutor();Future&amp;lt;String&amp;gt; future = executor.submit(() -&amp;gt; &quot;ok&quot;);tr">
+<meta name="twitter:image" content="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7V_zaWkfeUtgDQZ3Q94uO_jYpaDRXxxrhCYZPlgv22ZaXHfCz">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -129,36 +132,86 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
+            <article id="pages-future" class="article article-type-pages " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
   
+    <h1 class="article-title" itemprop="name">
+      Future 小解
+    </h1>
   
-    
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/blog/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/03/29/future/" class="archive-article-date">
+
+        
+        <a href="/blog/2018/03/29/future/" class="archive-article-date">
   	<time datetime="2018-03-29T11:39:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-29</time>
 </a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/03/29/future/">Future 小解</a>
-    </h1>
-  
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR7V_zaWkfeUtgDQZ3Q94uO_jYpaDRXxxrhCYZPlgv22ZaXHfCz" alt=""></p>
+<h3 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h3><p>Future是并发编程中一个重要的异步调用接口，它可以把多线程任务执行的结果通过异步的方式返回，通常我们可以这样做：</p>
+<figure class="highlight livescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService executor = Executors.newSingleThreadExecutor();</span><br><span class="line"></span><br><span class="line">Future&lt;String&gt; future = executor.submit<span class="function"><span class="params">(() -&gt; <span class="string">"ok"</span>)</span>;</span></span><br><span class="line"><span class="function"><span class="title">try</span> &#123;</span></span><br><span class="line"><span class="function">  <span class="title">String</span> <span class="title">result</span> = <span class="title">future</span>.<span class="title">get</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">&#125; <span class="title">catch</span> <span class="params">(InterruptedException | ExecutionException e)</span> &#123;</span></span><br><span class="line"><span class="function">  <span class="title">e</span>.<span class="title">printStackTrace</span><span class="params">()</span>;</span></span><br><span class="line"><span class="function">&#125;</span></span><br></pre></td></tr></table></figure>
+<a id="more"></a>
+<p>get()取得了线程执行的结果result = “ok”，但是要注意的是 <strong>future.get()是会阻塞当前线程的，直到任务结束</strong> </p>
+<h3 id="FutureTask"><a href="#FutureTask" class="headerlink" title="FutureTask"></a>FutureTask</h3><p>我们可以根据看Future接口一个实现FutureTask的相关代码。</p>
+<p>主要属性：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Possible state transitions:</span></span><br><span class="line"><span class="comment">* NEW -&gt; COMPLETING -&gt; NORMAL</span></span><br><span class="line"><span class="comment">* NEW -&gt; COMPLETING -&gt; EXCEPTIONAL</span></span><br><span class="line"><span class="comment">* NEW -&gt; CANCELLED</span></span><br><span class="line"><span class="comment">* NEW -&gt; INTERRUPTING -&gt; INTERRUPTED</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> state;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> <span class="keyword">NEW</span>          = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> COMPLETING   = <span class="number">1</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> NORMAL       = <span class="number">2</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> EXCEPTIONAL  = <span class="number">3</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> CANCELLED    = <span class="number">4</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INTERRUPTING = <span class="number">5</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> INTERRUPTED  = <span class="number">6</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/** The underlying callable; nulled out after running */</span></span><br><span class="line"><span class="keyword">private</span> Callable&lt;V&gt; callable;</span><br><span class="line"><span class="comment">/** The result to return or exception to throw from get() */</span></span><br><span class="line"><span class="keyword">private</span> Object outcome; <span class="comment">// non-volatile, protected by state reads/writes</span></span><br><span class="line"><span class="comment">/** The thread running the callable; CASed during run() */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> Thread runner;</span><br><span class="line"><span class="comment">/** Treiber stack of waiting threads */</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> WaitNode waiters;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>state表明了当前任务的状态</li>
+<li>callable是执行任务线程runnable转换而来</li>
+<li>outcome是任务执行结束的返回值</li>
+<li>runner表示任务的执行线程</li>
+<li>waiters是等待线程链表</li>
+</ul>
+<p>再看他的构造函数</p>
+<figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> FutureTask(Runnable runnable, V result) &#123;</span><br><span class="line">   <span class="keyword">this</span>.callable = Executors.callable(runnable, result);</span><br><span class="line">   <span class="keyword">this</span>.state = NEW;       <span class="comment">// ensure visibility of callable</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>初始状态下state值为NEW = 0, 通过上述相关注释我们知道，state状态值将会有以下几种变化：</p>
+<ul>
+<li>新建 -&gt; 进行中 -&gt; 正常</li>
+<li>新建 -&gt; 进行中 -&gt; 异常</li>
+<li>新建 -&gt; 取消</li>
+<li>新建 -&gt; 中断中 -&gt; 中断</li>
+</ul>
+<p>但是具体的这些状态在什么时候，在哪里变化，又有什么作用呢？</p>
+<h3 id="executor-submit"><a href="#executor-submit" class="headerlink" title="executor.submit"></a>executor.submit</h3><p>在上述的例子中我们调用了 <code>executor.submit</code> 方法，我们就以其为例，看一下java 线程池的处理过程。</p>
+<p>首先调用submit方法</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T&gt; Future&lt;T&gt; submit(Callable&lt;T&gt; task) &#123;</span><br><span class="line">   <span class="keyword">if</span> (task == <span class="literal">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> <span class="type">NullPointerException</span>();</span><br><span class="line">   RunnableFuture&lt;T&gt; ftask = <span class="keyword">new</span><span class="type">TaskFor</span>(task);</span><br><span class="line">   execute(ftask);</span><br><span class="line">   <span class="keyword">return</span> ftask;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">protected &lt;T&gt; RunnableFuture&lt;T&gt; <span class="keyword">new</span><span class="type">TaskFor</span>(Callable&lt;T&gt; callable) &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="keyword">new</span> <span class="type">FutureTask</span>&lt;T&gt;(callable);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先是构造一个FutureTask，然后是执行任务 <code>execute(ftask)</code>。</p>
+<p>执行的任务执行代码可以看<code>ThreadPoolExecutor</code> java线程池的任务执行过程，这里暂不表述，只贴下关键代码</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> execute(Runnable command) &#123;</span><br><span class="line">   <span class="keyword">if</span> (command == <span class="keyword">null</span>)</span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">   <span class="comment">/*</span></span><br><span class="line"><span class="comment">    * Proceed in 3 steps:</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * 1. If fewer than corePoolSize threads are running, try to</span></span><br><span class="line"><span class="comment">    * start a new thread with the given command as its first</span></span><br><span class="line"><span class="comment">    * task.  The call to addWorker atomically checks runState and</span></span><br><span class="line"><span class="comment">    * workerCount, and so prevents false alarms that would add</span></span><br><span class="line"><span class="comment">    * threads when it shouldn't, by returning false.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * 2. If a task can be successfully queued, then we still need</span></span><br><span class="line"><span class="comment">    * to double-check whether we should have added a thread</span></span><br><span class="line"><span class="comment">    * (because existing ones died since last checking) or that</span></span><br><span class="line"><span class="comment">    * the pool shut down since entry into this method. So we</span></span><br><span class="line"><span class="comment">    * recheck state and if necessary roll back the enqueuing if</span></span><br><span class="line"><span class="comment">    * stopped, or start a new thread if there are none.</span></span><br><span class="line"><span class="comment">    *</span></span><br><span class="line"><span class="comment">    * 3. If we cannot queue task, then we try to add a new</span></span><br><span class="line"><span class="comment">    * thread.  If it fails, we know we are shut down or saturated</span></span><br><span class="line"><span class="comment">    * and so reject the task.</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="built_in">int</span> c = ctl.<span class="built_in">get</span>();</span><br><span class="line">   <span class="keyword">if</span> (workerCountOf(c) &lt; corePoolSize) &#123;</span><br><span class="line">       <span class="keyword">if</span> (addWorker(command, <span class="keyword">true</span>))</span><br><span class="line">           <span class="keyword">return</span>;</span><br><span class="line">       c = ctl.<span class="built_in">get</span>();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">if</span> (isRunning(c) &amp;&amp; workQueue.offer(command)) &#123;</span><br><span class="line">       <span class="built_in">int</span> recheck = ctl.<span class="built_in">get</span>();</span><br><span class="line">       <span class="keyword">if</span> (! isRunning(recheck) &amp;&amp; remove(command))</span><br><span class="line">           reject(command);</span><br><span class="line">       <span class="keyword">else</span> <span class="keyword">if</span> (workerCountOf(recheck) == <span class="number">0</span>)</span><br><span class="line">           addWorker(<span class="keyword">null</span>, <span class="keyword">false</span>);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">else</span> <span class="keyword">if</span> (!addWorker(command, <span class="keyword">false</span>))</span><br><span class="line">       reject(command);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="built_in">boolean</span> addWorker(Runnable firstTask, <span class="built_in">boolean</span> core) &#123;</span><br><span class="line">   retry:</span><br><span class="line">   <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">       <span class="built_in">int</span> c = ctl.<span class="built_in">get</span>();</span><br><span class="line">       <span class="built_in">int</span> rs = runStateOf(c);</span><br><span class="line"></span><br><span class="line">       <span class="comment">// Check if queue empty only if necessary.</span></span><br><span class="line">       <span class="keyword">if</span> (rs &gt;= SHUTDOWN &amp;&amp;</span><br><span class="line">           ! (rs == SHUTDOWN &amp;&amp;</span><br><span class="line">              firstTask == <span class="keyword">null</span> &amp;&amp;</span><br><span class="line">              ! workQueue.isEmpty()))</span><br><span class="line">           <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">           <span class="built_in">int</span> wc = workerCountOf(c);</span><br><span class="line">           <span class="keyword">if</span> (wc &gt;= CAPACITY ||</span><br><span class="line">               wc &gt;= (core ? corePoolSize : maximumPoolSize))</span><br><span class="line">               <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">           <span class="keyword">if</span> (compareAndIncrementWorkerCount(c))</span><br><span class="line">               <span class="keyword">break</span> retry;</span><br><span class="line">           c = ctl.<span class="built_in">get</span>();  <span class="comment">// Re-read ctl</span></span><br><span class="line">           <span class="keyword">if</span> (runStateOf(c) != rs)</span><br><span class="line">               <span class="keyword">continue</span> retry;</span><br><span class="line">           <span class="comment">// else CAS failed due to workerCount change; retry inner loop</span></span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="built_in">boolean</span> workerStarted = <span class="keyword">false</span>;</span><br><span class="line">   <span class="built_in">boolean</span> workerAdded = <span class="keyword">false</span>;</span><br><span class="line">   Worker w = <span class="keyword">null</span>;</span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       w = <span class="keyword">new</span> Worker(firstTask);</span><br><span class="line">       <span class="keyword">final</span> Thread t = w.thread;</span><br><span class="line">       <span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="keyword">final</span> ReentrantLock mainLock = <span class="keyword">this</span>.mainLock;</span><br><span class="line">           mainLock.lock();</span><br><span class="line">           <span class="keyword">try</span> &#123;</span><br><span class="line">               <span class="comment">// Recheck while holding lock.</span></span><br><span class="line">               <span class="comment">// Back out on ThreadFactory failure or if</span></span><br><span class="line">               <span class="comment">// shut down before lock acquired.</span></span><br><span class="line">               <span class="built_in">int</span> rs = runStateOf(ctl.<span class="built_in">get</span>());</span><br><span class="line"></span><br><span class="line">               <span class="keyword">if</span> (rs &lt; SHUTDOWN ||</span><br><span class="line">                   (rs == SHUTDOWN &amp;&amp; firstTask == <span class="keyword">null</span>)) &#123;</span><br><span class="line">                   <span class="keyword">if</span> (t.isAlive()) <span class="comment">// precheck that t is startable</span></span><br><span class="line">                       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalThreadStateException();</span><br><span class="line">                   workers.<span class="built_in">add</span>(w);</span><br><span class="line">                   <span class="built_in">int</span> s = workers.<span class="built_in">size</span>();</span><br><span class="line">                   <span class="keyword">if</span> (s &gt; largestPoolSize)</span><br><span class="line">                       largestPoolSize = s;</span><br><span class="line">                   workerAdded = <span class="keyword">true</span>;</span><br><span class="line">               &#125;</span><br><span class="line">           &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">               mainLock.unlock();</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">if</span> (workerAdded) &#123;</span><br><span class="line">           </span><br><span class="line">                <span class="comment">//a、重要步骤</span></span><br><span class="line">               t.start();</span><br><span class="line">               workerStarted = <span class="keyword">true</span>;</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">       <span class="keyword">if</span> (! workerStarted)</span><br><span class="line">           addWorkerFailed(w);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="keyword">return</span> workerStarted;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>大致过程是把任务线程加入线程池中（加入过程暂且不表），如果加入成功就启动线程执行</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="comment">(workerAdded)</span> &#123;</span><br><span class="line">           </span><br><span class="line">     <span class="comment">//a、重要步骤</span></span><br><span class="line">    t.start<span class="comment">()</span>;</span><br><span class="line">    workerStarted = true;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>t.start()方法开始执行线程，又因为当前的任务线程是为FutureTask创建的，t.start方法调用后将执行FutureTask中对应的run方法。</p>
+<h3 id="FutureTask-run"><a href="#FutureTask-run" class="headerlink" title="FutureTask.run"></a>FutureTask.run</h3><figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public void run() &#123;</span><br><span class="line">   if (<span class="keyword">state</span> != NEW ||</span><br><span class="line">       !UNSAFE.compareAndSwapObject(this, runnerOffset,</span><br><span class="line">                                    null, Thread.currentThread()))</span><br><span class="line">       return;</span><br><span class="line">   try &#123;</span><br><span class="line">       Callable<span class="variable">&lt;V&gt;</span> c = callable;</span><br><span class="line">       if (c != null &amp;&amp; <span class="keyword">state</span> == NEW) &#123;</span><br><span class="line">           V result;</span><br><span class="line">           boolean ran;</span><br><span class="line">           try &#123;</span><br><span class="line">               result = c.call();</span><br><span class="line">               ran = true;</span><br><span class="line">           &#125; catch (Throwable ex) &#123;</span><br><span class="line">               result = null;</span><br><span class="line">               ran = false;</span><br><span class="line">               <span class="built_in">set</span>Exception(ex);</span><br><span class="line">           &#125;</span><br><span class="line">           if (ran)</span><br><span class="line">               <span class="built_in">set</span>(result);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125; finally &#123;</span><br><span class="line">       // runner must be non-null until <span class="keyword">state</span> is settled <span class="keyword">to</span></span><br><span class="line">       // prevent concurrent calls <span class="keyword">to</span> run()</span><br><span class="line">       runner = null;</span><br><span class="line">       // <span class="keyword">state</span> must be re-read after nulling runner <span class="keyword">to</span> prevent</span><br><span class="line">       // leaked interrupts</span><br><span class="line">       int s = <span class="keyword">state</span>;</span><br><span class="line">       if (s &gt;= INTERRUPTING)</span><br><span class="line">           handlePossibleCancellationInterrupt(s);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>观察上述代码我们得知，如果callable 实例c 不为空且任务状态是new，则开始调用call()方法。如果call正常执行完毕，设置ran=true，调用set方法。</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Unsafe mechanics</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> sun.misc.Unsafe UNSAFE;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> stateOffset;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> runnerOffset;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> waitersOffset;</span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       UNSAFE = sun.misc.Unsafe.getUnsafe();</span><br><span class="line">       <span class="keyword">Class</span>&lt;?&gt; k = FutureTask.<span class="keyword">class</span>;</span><br><span class="line">       stateOffset = UNSAFE.objectFieldOffset</span><br><span class="line">           (k.getDeclaredField(<span class="string">"state"</span>));</span><br><span class="line">       runnerOffset = UNSAFE.objectFieldOffset</span><br><span class="line">           (k.getDeclaredField(<span class="string">"runner"</span>));</span><br><span class="line">       waitersOffset = UNSAFE.objectFieldOffset</span><br><span class="line">           (k.getDeclaredField(<span class="string">"waiters"</span>));</span><br><span class="line">   &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> Error(e);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> set(V v) &#123;</span><br><span class="line">   <span class="keyword">if</span> (UNSAFE.compareAndSwapInt(<span class="keyword">this</span>, stateOffset, <span class="keyword">NEW</span>, COMPLETING)) &#123;</span><br><span class="line">       outcome = v;</span><br><span class="line">       UNSAFE.putOrderedInt(<span class="keyword">this</span>, stateOffset, NORMAL); <span class="comment">// final state</span></span><br><span class="line">       finishCompletion();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>观察set方法发现是通过Unsafe类的cas设置state状态值为COMPLETING，把结果v赋值给outcome,然后将state状态值设置为normal，并调用finishCompletion方法</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">void</span> finishCompletion() &#123;</span><br><span class="line">   <span class="comment">// assert state &gt; COMPLETING;</span></span><br><span class="line">   <span class="keyword">for</span> (WaitNode q; (q = waiters) != <span class="keyword">null</span>;) &#123;</span><br><span class="line">       <span class="keyword">if</span> (UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, waitersOffset, q, <span class="keyword">null</span>)) &#123;</span><br><span class="line">           <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">               Thread t = q.thread;</span><br><span class="line">               <span class="keyword">if</span> (t != <span class="keyword">null</span>) &#123;</span><br><span class="line">                   q.thread = <span class="keyword">null</span>;</span><br><span class="line">                   LockSupport.unpark(t);</span><br><span class="line">               &#125;</span><br><span class="line">               WaitNode <span class="keyword">next</span> = q.<span class="keyword">next</span>;</span><br><span class="line">               <span class="keyword">if</span> (<span class="keyword">next</span> == <span class="keyword">null</span>)</span><br><span class="line">                   <span class="keyword">break</span>;</span><br><span class="line">               q.<span class="keyword">next</span> = <span class="keyword">null</span>; <span class="comment">// unlink to help gc</span></span><br><span class="line">               q = <span class="keyword">next</span>;</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">break</span>;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   done();</span><br><span class="line"></span><br><span class="line">   callable = <span class="keyword">null</span>;        <span class="comment">// to reduce footprint</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个方法主要是唤醒调用get()方法产生阻塞的线程。通过循环waitNode节点，cas找到当前任务节点，然后调用LockSupport.unpark()唤醒阻塞的线程。<a href="https://segmentfault.com/a/1190000008420938" target="_blank" rel="noopener">有关LockSupport的详情可至此了解</a></p>
+<p>对于call方法执行异常的情况将会进行setExeception()，大致处理流程类似正常流程</p>
+<figure class="highlight pf"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">protected void <span class="built_in">set</span>Exception(Throwable t) &#123;</span><br><span class="line">   if (UNSAFE.compareAndSwapInt(this, <span class="keyword">state</span>Offset, NEW, COMPLETING)) &#123;</span><br><span class="line">       outcome = t;</span><br><span class="line">       UNSAFE.putOrderedInt(this, <span class="keyword">state</span>Offset, EXCEPTIONAL); // final <span class="keyword">state</span></span><br><span class="line">       finishCompletion();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="FutureTask-get"><a href="#FutureTask-get" class="headerlink" title="FutureTask.get()"></a>FutureTask.get()</h3><p>我们查看FutureTask的get()或get(long timeout, TimeUnit unit)的FutureTask相关实现，发现会在awaitDone方法处自旋等待，看具体的代码</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"> <span class="keyword">public</span> V get(<span class="keyword">long</span> timeout, TimeUnit unit)</span><br><span class="line">        <span class="keyword">throws</span> InterruptedException, ExecutionException, TimeoutException &#123;</span><br><span class="line">   <span class="keyword">if</span> (unit == <span class="keyword">null</span>)</span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">   <span class="keyword">int</span> s = state;</span><br><span class="line">   <span class="keyword">if</span> (s &lt;= COMPLETING &amp;&amp;</span><br><span class="line">       (s = awaitDone(<span class="keyword">true</span>, unit.toNanos(timeout))) &lt;= COMPLETING)</span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> TimeoutException();</span><br><span class="line">   <span class="function"><span class="keyword">return</span> <span class="title">report</span><span class="params">(s)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> awaitDone(<span class="keyword">boolean</span> timed, <span class="keyword">long</span> nanos)</span><br><span class="line">        <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">   <span class="keyword">final</span> <span class="keyword">long</span> deadline = timed ? System.nanoTime() + nanos : 0L;</span><br><span class="line">   WaitNode q = <span class="keyword">null</span>;</span><br><span class="line">   <span class="keyword">boolean</span> queued = <span class="keyword">false</span>;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">// a、for循环自旋</span></span><br><span class="line">   <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">       <span class="keyword">if</span> (Thread.interrupted()) &#123;</span><br><span class="line">           removeWaiter(q);</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> InterruptedException();</span><br><span class="line">       &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// b、state表示当前任务的状态值</span></span><br><span class="line">       <span class="keyword">int</span> s = state;</span><br><span class="line">       </span><br><span class="line">       <span class="comment">// c、状态值大于处理中(可能结束或者异常)就返回</span></span><br><span class="line">       <span class="keyword">if</span> (s &gt; COMPLETING) &#123;</span><br><span class="line">           <span class="keyword">if</span> (q != <span class="keyword">null</span>)</span><br><span class="line">               q.thread = <span class="keyword">null</span>;</span><br><span class="line">           <span class="keyword">return</span> s;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="comment">// d、在处理中，等一会～</span></span><br><span class="line">       <span class="keyword">else</span> <span class="keyword">if</span> (s == COMPLETING) <span class="comment">// cannot time out yet</span></span><br><span class="line">           Thread.yield();</span><br><span class="line">       <span class="keyword">else</span> <span class="keyword">if</span> (q == <span class="keyword">null</span>)</span><br><span class="line">           q = <span class="keyword">new</span> WaitNode();</span><br><span class="line">       <span class="keyword">else</span> <span class="keyword">if</span> (!queued)</span><br><span class="line">           queued = UNSAFE.compareAndSwapObject(<span class="keyword">this</span>, waitersOffset,</span><br><span class="line">                                                q.next = waiters, q);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// e、超时等待处理                                                </span></span><br><span class="line">       <span class="function"><span class="keyword">else</span> <span class="title">if</span> <span class="params">(timed)</span> </span>&#123;</span><br><span class="line">           nanos = deadline - System.nanoTime();</span><br><span class="line">           <span class="comment">// 超过等待时间，移除节点</span></span><br><span class="line">           <span class="keyword">if</span> (nanos &lt;= <span class="number">0</span>L) &#123;</span><br><span class="line">               removeWaiter(q);</span><br><span class="line">               <span class="keyword">return</span> state;</span><br><span class="line">           &#125;</span><br><span class="line">        <span class="comment">// 等待指定时间  </span></span><br><span class="line">        LockSupport.parkNanos(<span class="keyword">this</span>, nanos);</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">else</span></span><br><span class="line">           LockSupport.park(<span class="keyword">this</span>);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>java线程池中对Future的应用是通过其实现类FutureTask来实现的异步调用</p>
+<ul>
+<li>FutureTask中通过volatile的state值的变化来确定任务处理状态</li>
+<li>线程池初始创建状态为NEW</li>
+<li>当任务加入到线程池中后，执行线程start, 再调用FutureTask的run方法处理任务</li>
+<li>任务处理过程中通过cas修改state值（正常或者异常）并LockSupport unpark 线程</li>
+<li>FutureTask get 方法自旋查看state值的变化以及对超时等待和LockSupport.park线程 </li>
+</ul>
 
-        <div class="article-info info-on-right">
-          
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -174,187 +227,131 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/03/29/future/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/07/cas/" class="archive-article-date">
-  	<time datetime="2018-02-07T07:39:50.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-07</time>
-</a>
+<nav id="article-nav">
+  
+    <a href="/blog/2018/04/11/wechat-nickname/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          微信nickName包含emoji表情问题修改
+        
+      </div>
+    </a>
+  
+  
+    <a href="/blog/2018/03/21/limit/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">限流小解</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/07/cas/">CAS的一点理解</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/05/CyclicBarrier/" class="archive-article-date">
-  	<time datetime="2018-02-05T09:26:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-05</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/05/CyclicBarrier/">CyclicBarrier 详解</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/02/countdownlatch/" class="archive-article-date">
-  	<time datetime="2018-02-02T06:09:25.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-02</time>
-</a>
-        </div>
-    	 
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/02/countdownlatch/">CountDownLatch 详解</a>
-    </h1>
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
   
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/02/01/线程状态流转/" class="archive-article-date">
-  	<time datetime="2018-02-01T10:40:24.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-01</time>
-</a>
-        </div>
-    	 
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '{{page.articleID}}',
+  owner: 'peanuts0',
+  repo: 'blog',
+  oauth: {
+    client_id: '17716911d1143cda96e6',
+    client_secret: '9be9112ba195381de296db28a6eda05903c65d16',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/02/01/线程状态流转/">java线程状态流转</a>
-    </h1>
-  
-
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color4">多线程</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
-  
-
-    
 
 
           </div>
@@ -377,9 +374,9 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
+		isPost: true,
 		isArchive: false,
-		isTag: true,
+		isTag: false,
 		isCategory: false,
 		open_in_new: false,
 		toc_hide_index: true,
