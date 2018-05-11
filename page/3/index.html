@@ -131,6 +131,200 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="pages-jsonReader" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2018/01/25/jsonReader/">json文件导入</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2018/01/25/jsonReader/" class="archive-article-date">
+  	<time datetime="2018-01-25T05:53:59.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-25</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h3 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h3><p>现在有一个全国省市区数据的json文件数据要导入数据库</p>
+<h3 id="思路"><a href="#思路" class="headerlink" title="思路"></a>思路</h3><p>最简单的办法就是把这些json字符串放入一个String中，然后再用fastJson等类库，把String转换成对应的对象，再作其他入库处理。 这个有个问题就是String的大小容量问题</p>
+<h5 id="放-String为何不合适"><a href="#放-String为何不合适" class="headerlink" title="放 String为何不合适"></a>放 String为何不合适</h5><figure class="highlight ocaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/** <span class="type">The</span> <span class="keyword">value</span> is used <span class="keyword">for</span> character storage. */</span><br><span class="line">    <span class="keyword">private</span> final <span class="built_in">char</span> <span class="keyword">value</span><span class="literal">[]</span>;</span><br></pre></td></tr></table></figure>
+<p>String 的数据其实都是放在了这个final的字符数组中，那么其长度限制就是Integer.MAX_VALUE 也就是2^31 - 1 = 2147483647 。那么如果这个vaue[]<br>占满了，要耗费多少内存呢？</p>
+<p>这个我们插入一个知识点：</p>
+<blockquote>
+<p>字节：byte<br>    位：bit<br>    字符：char<br>    一个字节占8位，也就是1 byte = 8 bit<br>    一个字符占16位，也就是1 char = 16 bit = 2 byte<br>    1KB = 1024 byte<br>    1MB = 1024 KB<br>    1GB = 1024 MB<br>    1TB = 1024 GB</p>
+</blockquote>
+        
+          <a class="article-more-a" href="/blog/2018/01/25/jsonReader/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2018/01/25/jsonReader/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
+    <article id="post-15166108339904" class="article article-type-post  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2018/01/22/15166108339904/">scp</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2018/01/22/15166108339904/" class="archive-article-date">
+  	<time datetime="2018-01-22T08:47:13.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-01-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="media/15166108339904/15166303162584.jpg" alt=""></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我们经常会需要本机与服务器之间进行传输文件，以前用windows时用xshell里面有ftp直接拖就行了，现在转到mac，还没有找到一好的工具来满足这方面的需求，只能靠命令来解决了。</p>
+<h2 id="scp"><a href="#scp" class="headerlink" title="scp"></a>scp</h2><p>scp是secure copy的简写，用于在Linux下进行远程拷贝文件的命令，和它类似的命令有cp，不过cp只是在本机进行拷贝不能跨服务器，而且scp传输是加密的。可能会稍微影响一下速度。当你服务器硬盘变为只读 read only system时，用scp可以帮你把文件移出来。另外，scp还非常不占资源，不会提高多少系统负荷，在这一点上，rsync就远远不及它了。虽然 rsync比scp会快一点，但当小文件众多的情况下，rsync会导致硬盘I/O非常高，而scp基本不影响系统正常使用。</p>
+<p>1．命令格式：</p>
+<p>scp [参数] [原路径] [目标路径]</p>
+<p>2．命令功能：</p>
+<p>scp是 secure copy的缩写, scp是linux系统下基于ssh登陆进行安全的远程文件拷贝命令。linux的scp命令可以在linux服务器之间复制文件和目录。</p>
+<p>3．命令参数：</p>
+<p>-1  强制scp命令使用协议ssh1  </p>
+<p>-2  强制scp命令使用协议ssh2  </p>
+<p>-4  强制scp命令只使用IPv4寻址  </p>
+<p>-6  强制scp命令只使用IPv6寻址  </p>
+<p>-B  使用批处理模式（传输过程中不询问传输口令或短语）  </p>
+<p>-C  允许压缩。（将-C标志传递给ssh，从而打开压缩功能）  </p>
+<p>-p 保留原文件的修改时间，访问时间和访问权限。  </p>
+<p>-q  不显示传输进度条。  </p>
+<p>-r  递归复制整个目录。  </p>
+<p>-v 详细方式显示输出。scp和ssh(1)会显示出整个过程的调试信息。这些信息用于调试连接，验证和配置问题。   </p>
+<p>-c cipher  以cipher将数据传输进行加密，这个选项将直接传递给ssh。   </p>
+<p>-F ssh_config  指定一个替代的ssh配置文件，此参数直接传递给ssh。  </p>
+<p>-i identity_file  从指定文件中读取传输时使用的密钥文件，此参数直接传递给ssh。    </p>
+<p>-l limit  限定用户所能使用的带宽，以Kbit/s为单位。     </p>
+<p>-o ssh_option  如果习惯于使用ssh_config(5)中的参数传递方式，   </p>
+<p>-P port  注意是大写的P, port是指定数据传输用到的端口号   </p>
+<p>-S program  指定加密传输时所使用的程序。此程序必须能够理解ssh(1)的选项。</p>
+<h3 id="本地文件至服务器"><a href="#本地文件至服务器" class="headerlink" title="本地文件至服务器"></a>本地文件至服务器</h3><p>(1) 复制文件：</p>
+<p>比如我mac上有个btrace的包（/Applications/devTools/btrace/btrace-bin-1.3.9.tgz）要传输至服务器172.16.80.63的/home/admin/scripts的目录上，并且我们知道172.16.80.63服务器上的一个用户名与密码 admin/E3rFi4E8yUOR1QT78Ip7ug<br>命令如下：<br>scp /Applications/devTools/btrace/btrace-bin-1.3.9.tgz admin@172.16.80.63:/home/admin/scripts</p>
+<p>再输入密码即可传输完成。<br><img src="media/15166108339904/15166119829462.jpg" alt=""></p>
+<p>(1) 复制目录：<br>同上，现在mac上有个btrace的目录要复制至上述的目录中</p>
+<p>命令如下：<br>scp -r /Applications/devTools/btrace/btrace-bin-1.3.9 admin@172.16.80.63:/home/admin/scripts</p>
+<p>再输入密码完成<br><img src="media/15166108339904/15166122522556.jpg" alt=""></p>
+<h3 id="服务器文件至本地"><a href="#服务器文件至本地" class="headerlink" title="服务器文件至本地"></a>服务器文件至本地</h3><p>服务器文件至本地与本地文件至服务器的方式差不多，只不过把命令后面的两个参数调换一下。直接看命令：<br>scp admin@172.16.80.63:/home/admin/scripts/clean_log.sh /Users/peanuthuang/Desktop</p>
+<p>再输入密码完成把clean_log.sh脚本复制至本地desktop文件目录内。</p>
+<p><img src="media/15166108339904/15166126587594.jpg" alt=""></p>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Linux</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">命令</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2018/01/22/15166108339904/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="post-15165864139104" class="article article-type-post  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -306,6 +500,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
@@ -314,7 +512,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+                <a href="javascript:void(0)" class="js-tag color3">code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -343,6 +541,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
             
             <div class="clearfix"></div>
