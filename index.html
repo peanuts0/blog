@@ -131,6 +131,88 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="pages-lrumap" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2018/05/22/lrumap/">lrumap 初识</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2018/05/22/lrumap/" class="archive-article-date">
+  	<time datetime="2018-05-22T11:57:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-05-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>LRU（Least Recently Used）即最近最少使用。对于内存缓存，LRUMap可以实现将一些不常使用的缓存对象删除，来保证只存有一定数量的缓存对象。</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LRUMap&lt;Integer, Integer&gt; <span class="built_in">map</span> = <span class="keyword">new</span> LRUMap&lt;&gt;(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">get</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">3</span>,<span class="number">3</span>);</span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">4</span>,<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="built_in">map</span>.<span class="built_in">size</span>());</span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="built_in">map</span>.<span class="built_in">get</span>(<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<blockquote>
+<p>3<br>null</p>
+</blockquote>
+<p><code>new LRUMap&lt;&gt;(3)</code> 初始化时指定了map的最大缓存数量为3，然后我们依次put了4个元素，最终只存储了3个元素，但又因为中途对1进行了get操作（最近使用），使得元素2成为最远最不常使用的元素，所以将2回收了。</p>
+        
+          <a class="article-more-a" href="/blog/2018/05/22/lrumap/#more">more >></a>
+        
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2018/05/22/lrumap/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="pages-codeRecord" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -677,83 +759,6 @@
 
 
   
-    <article id="pages-interview" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/03/14/interview/">spring解决bean循环依赖</a>
-    </h1>
-  
-
-        
-        <a href="/blog/2018/03/14/interview/" class="archive-article-date">
-  	<time datetime="2018-03-14T01:48:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-14</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">A &#123;</span><br><span class="line">    private <span class="keyword">B </span><span class="keyword">b;</span></span><br><span class="line"><span class="keyword">&#125;</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">B </span>&#123;</span><br><span class="line">    private A a<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在类A初始化时发现B还未初始化，先去初始化B，然而当B初始化时发现要先初始化A，这样就陷入死循环了，spring ioc是如何解决这个问题的呢？</p>
-        
-          <a class="article-more-a" href="/blog/2018/03/14/interview/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Spring</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/03/14/interview/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="page-number" href="/blog/page/3/">3</a><a class="extend next" rel="next" href="/blog/page/2/">Next &raquo;</a>
@@ -843,10 +848,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">工具</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
@@ -855,7 +856,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">code 小记</a>
+                <a href="javascript:void(0)" class="js-tag color3">工具</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -867,11 +868,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Guava</a>
+                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Spring</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Guava</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -884,10 +889,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
             
             <div class="clearfix"></div>

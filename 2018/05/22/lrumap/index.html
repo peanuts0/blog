@@ -6,18 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>Archives: 2018/5 | 花生的博客</title>
+  <title>lrumap 初识 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="坐标杭州，二流程序员">
-<meta name="keywords" content="后端，linux，java，spring，分布式，python">
-<meta property="og:type" content="website">
-<meta property="og:title" content="花生的博客">
-<meta property="og:url" content="//peanuts0.github.io/archives/2018/05/index.html">
+  <meta name="description" content="介绍LRU（Least Recently Used）即最近最少使用。对于内存缓存，LRUMap可以实现将一些不常使用的缓存对象删除，来保证只存有一定数量的缓存对象。 例子123456789101112LRUMap&amp;lt;Integer, Integer&amp;gt; map = new LRUMap&amp;lt;&amp;gt;(3);map.put(1,1);map.put(2,2);map.get(1);map.">
+<meta name="keywords" content="Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lrumap 初识">
+<meta property="og:url" content="//peanuts0.github.io/2018/05/22/lrumap/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="坐标杭州，二流程序员">
+<meta property="og:description" content="介绍LRU（Least Recently Used）即最近最少使用。对于内存缓存，LRUMap可以实现将一些不常使用的缓存对象删除，来保证只存有一定数量的缓存对象。 例子123456789101112LRUMap&amp;lt;Integer, Integer&amp;gt; map = new LRUMap&amp;lt;&amp;gt;(3);map.put(1,1);map.put(2,2);map.get(1);map.">
+<meta property="og:updated_time" content="2018-06-05T08:50:13.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="花生的博客">
-<meta name="twitter:description" content="坐标杭州，二流程序员">
+<meta name="twitter:title" content="lrumap 初识">
+<meta name="twitter:description" content="介绍LRU（Least Recently Used）即最近最少使用。对于内存缓存，LRUMap可以实现将一些不常使用的缓存对象删除，来保证只存有一定数量的缓存对象。 例子123456789101112LRUMap&amp;lt;Integer, Integer&amp;gt; map = new LRUMap&amp;lt;&amp;gt;(3);map.put(1,1);map.put(2,2);map.get(1);map.">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -129,36 +130,61 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            
-  
-  
+            <article id="pages-lrumap" class="article article-type-pages " itemscope itemprop="blogPost">
+  <div class="article-inner">
     
-    
-      
-      
-      <section class="archives-wrap">
-        <div class="archive-year-wrap">
-          <a href="/blog/archives/2018" class="archive-year">2018</a>
-        </div>
-        <div class="archives">
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/05/22/lrumap/" class="archive-article-date">
-  	<time datetime="2018-05-22T11:57:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-05-22</time>
-</a>
-        </div>
-    	 
+      <header class="article-header">
+        
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/05/22/lrumap/">lrumap 初识</a>
+    <h1 class="article-title" itemprop="name">
+      lrumap 初识
     </h1>
   
 
-        <div class="article-info info-on-right">
-          
+        
+        <a href="/blog/2018/05/22/lrumap/" class="archive-article-date">
+  	<time datetime="2018-05-22T11:57:23.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-05-22</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>LRU（Least Recently Used）即最近最少使用。对于内存缓存，LRUMap可以实现将一些不常使用的缓存对象删除，来保证只存有一定数量的缓存对象。</p>
+<h2 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h2><figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LRUMap&lt;Integer, Integer&gt; <span class="built_in">map</span> = <span class="keyword">new</span> LRUMap&lt;&gt;(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">1</span>,<span class="number">1</span>);</span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">2</span>,<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">get</span>(<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">3</span>,<span class="number">3</span>);</span><br><span class="line"><span class="built_in">map</span>.<span class="built_in">put</span>(<span class="number">4</span>,<span class="number">4</span>);</span><br><span class="line"></span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="built_in">map</span>.<span class="built_in">size</span>());</span><br><span class="line">System.out.<span class="built_in">println</span>(<span class="built_in">map</span>.<span class="built_in">get</span>(<span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+<p>结果</p>
+<blockquote>
+<p>3<br>null</p>
+</blockquote>
+<p><code>new LRUMap&lt;&gt;(3)</code> 初始化时指定了map的最大缓存数量为3，然后我们依次put了4个元素，最终只存储了3个元素，但又因为中途对1进行了get操作（最近使用），使得元素2成为最远最不常使用的元素，所以将2回收了。</p>
+<a id="more"></a>
+<h2 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h2><p>LRUMap是org.apache.commons.collections4.map包下的类</p>
+<figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">LRUMap&lt;K</span>, <span class="title">V&gt;</span></span></span><br><span class="line"><span class="class">        <span class="keyword">extends</span> <span class="title">AbstractLinkedMap&lt;K</span>, <span class="title">V&gt;</span> <span class="title">implements</span> <span class="title">BoundedMap&lt;K</span>, <span class="title">V&gt;</span>, <span class="title">Serializable</span>, <span class="title">Cloneable</span></span>&#123;</span><br><span class="line">        </span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractLinkedMap&lt;K</span>, <span class="title">V&gt;</span> <span class="keyword">extends</span> <span class="title">AbstractHashedMap&lt;K</span>, <span class="title">V&gt;</span> <span class="title">implements</span> <span class="title">OrderedMap&lt;K</span>, <span class="title">V&gt;</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>LRUMap继承了AbstractLinkedMap，AbstractLinkedMap继承了AbstractHashedMap，可以预想LRU应该是基于链表的方式实现的：<br>每次元素操作（put,get等）将元素移动链表的一端，当元素个数达到最大值时，将从链表的另一端开始做清理</p>
+<h3 id="header"><a href="#header" class="headerlink" title="header"></a>header</h3><p>AbstractHashedMap的构造函数中有个init()方法</p>
+<figure class="highlight aspectj"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="title">AbstractHashedMap</span><span class="params">(<span class="keyword">final</span> <span class="keyword">int</span> initialCapacity, <span class="keyword">final</span> <span class="keyword">float</span> loadFactor, <span class="keyword">final</span> <span class="keyword">int</span> threshold)</span> </span>&#123;</span><br><span class="line">   <span class="keyword">super</span>();</span><br><span class="line">   <span class="keyword">this</span>.loadFactor = loadFactor;</span><br><span class="line">   <span class="keyword">this</span>.data = <span class="keyword">new</span> HashEntry[initialCapacity];</span><br><span class="line">   <span class="keyword">this</span>.threshold = threshold;</span><br><span class="line">   init();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后其具体实现在AbstractLinkedMap中</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> init() &#123;</span><br><span class="line">   header = createEntry(<span class="keyword">null</span>, -<span class="number">1</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">   header.before = header.after = header;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> LinkEntry&lt;K, V&gt; createEntry(<span class="keyword">final</span> HashEntry&lt;K, V&gt; <span class="keyword">next</span>, <span class="keyword">final</span> <span class="keyword">int</span> hashCode, <span class="keyword">final</span> K key, <span class="keyword">final</span> V value) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> LinkEntry&lt;K, V&gt;(<span class="keyword">next</span>, hashCode, convertKey(key), value);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>init() 创建了一个hashCode为-1的header节点，并且该header首尾自相联</strong>。与header相关的节点即构成了LRU缓存对象节点列表</p>
+<h3 id="put"><a href="#put" class="headerlink" title="put"></a>put</h3><figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> V put(<span class="keyword">final</span> K key, <span class="keyword">final</span> V <span class="keyword">value</span>) &#123;</span><br><span class="line">        <span class="keyword">final</span> Object convertedKey = convertKey(key);</span><br><span class="line">        <span class="keyword">final</span> <span class="built_in">int</span> hashCode = hash(convertedKey);</span><br><span class="line">        <span class="keyword">final</span> <span class="built_in">int</span> <span class="built_in">index</span> = hashIndex(hashCode, <span class="keyword">data</span>.length);</span><br><span class="line">        HashEntry&lt;K, V&gt; <span class="built_in">entry</span> = <span class="keyword">data</span>[<span class="built_in">index</span>];</span><br><span class="line">        // k-v 存在时</span><br><span class="line">        <span class="keyword">while</span> (<span class="built_in">entry</span> <span class="comment">!= null) &#123;</span></span><br><span class="line">            // 定位到某个k-v</span><br><span class="line">            <span class="keyword">if</span> (<span class="built_in">entry</span>.hashCode == hashCode &amp;&amp; isEqualKey(convertedKey, <span class="built_in">entry</span>.key)) &#123;</span><br><span class="line">                <span class="keyword">final</span> V oldValue = <span class="built_in">entry</span>.getValue();</span><br><span class="line">                updateEntry(<span class="built_in">entry</span>, <span class="keyword">value</span>);</span><br><span class="line">                <span class="keyword">return</span> oldValue;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="built_in">entry</span> = <span class="built_in">entry</span>.next;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        addMapping(<span class="built_in">index</span>, hashCode, key, <span class="keyword">value</span>);</span><br><span class="line">        <span class="keyword">return</span> null;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="keyword">protected</span> void updateEntry(<span class="keyword">final</span> HashEntry&lt;K, V&gt; <span class="built_in">entry</span>, <span class="keyword">final</span> V newValue) &#123;</span><br><span class="line">        moveToMRU((LinkEntry&lt;K, V&gt;) <span class="built_in">entry</span>);  // handles modCount</span><br><span class="line">        <span class="built_in">entry</span>.setValue(newValue);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>put的时候有个updateEntry的操作，其中执行了moveToMRU方法</p>
+<figure class="highlight armasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="symbol">protected</span> void <span class="keyword">moveToMRU(final </span>LinkEntry&lt;K, V&gt; <span class="meta">entry</span>) &#123;</span><br><span class="line">        <span class="meta">if</span> (<span class="meta">entry</span>.after != header) &#123;</span><br><span class="line">            modCount++<span class="comment">;</span></span><br><span class="line">            // remove</span><br><span class="line">            <span class="meta">if</span>(<span class="meta">entry</span>.<span class="keyword">before </span>== null) &#123;</span><br><span class="line">                throw new IllegalStateException(<span class="string">"Entry.before is null."</span> +</span><br><span class="line">                    <span class="string">" Please check that your keys are immutable, and that you have used synchronization properly."</span> +</span><br><span class="line">                    <span class="string">" If so, then please report this to dev@commons.apache.org as a bug."</span>)<span class="comment">;</span></span><br><span class="line">            &#125;</span><br><span class="line">            // 把当前节点的前后节点的的<span class="keyword">before和after重新赋值</span></span><br><span class="line"><span class="keyword"> </span>           <span class="meta">entry</span>.<span class="keyword">before.after </span>= <span class="meta">entry</span>.after<span class="comment">;</span></span><br><span class="line">            <span class="meta">entry</span>.after.<span class="keyword">before </span>= <span class="meta">entry</span>.<span class="keyword">before;</span></span><br><span class="line"><span class="keyword"> </span>           // <span class="keyword">add </span>first</span><br><span class="line">            // 把当前节点移动至header节点</span><br><span class="line">            <span class="meta">entry</span>.after = header<span class="comment">;</span></span><br><span class="line">            <span class="meta">entry</span>.<span class="keyword">before </span>= header.<span class="keyword">before;</span></span><br><span class="line"><span class="keyword"> </span>           header.<span class="keyword">before.after </span>= <span class="meta">entry</span><span class="comment">;</span></span><br><span class="line">            header.<span class="keyword">before </span>= <span class="meta">entry</span><span class="comment">;</span></span><br><span class="line">        &#125; <span class="meta">else</span> <span class="meta">if</span> (<span class="meta">entry</span> == header) &#123;</span><br><span class="line">            throw new IllegalStateException(<span class="string">"Can't move header to MRU"</span> +</span><br><span class="line">                <span class="string">" (please report this to dev@commons.apache.org)"</span>)<span class="comment">;</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>就put操作而言，moveToMRU方法把当前这个entry移动为 “<strong>最近最常使用</strong>”。然后执行addMapping()</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> addMapping(<span class="keyword">final</span> <span class="built_in">int</span> hashIndex, <span class="keyword">final</span> <span class="built_in">int</span> hashCode, <span class="keyword">final</span> K <span class="built_in">key</span>, <span class="keyword">final</span> V value) &#123;</span><br><span class="line">   <span class="keyword">if</span> (isFull()) &#123;</span><br><span class="line">       LinkEntry&lt;K, V&gt; reuse = header.after;</span><br><span class="line">       <span class="built_in">boolean</span> removeLRUEntry = <span class="keyword">false</span>;</span><br><span class="line">       <span class="keyword">if</span> (scanUntilRemovable) &#123;</span><br><span class="line">           <span class="keyword">while</span> (reuse != header &amp;&amp; reuse != <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">if</span> (removeLRU(reuse)) &#123;</span><br><span class="line">                   removeLRUEntry = <span class="keyword">true</span>;</span><br><span class="line">                   <span class="keyword">break</span>;</span><br><span class="line">               &#125;</span><br><span class="line">               reuse = reuse.after;</span><br><span class="line">           &#125;</span><br><span class="line">           <span class="keyword">if</span> (reuse == <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">                   <span class="string">"Entry.after=null, header.after"</span> + header.after + <span class="string">" header.before"</span> + header.before +</span><br><span class="line">                   <span class="string">" key="</span> + <span class="built_in">key</span> + <span class="string">" value="</span> + value + <span class="string">" size="</span> + <span class="built_in">size</span> + <span class="string">" maxSize="</span> + maxSize +</span><br><span class="line">                   <span class="string">" Please check that your keys are immutable, and that you have used synchronization properly."</span> +</span><br><span class="line">                   <span class="string">" If so, then please report this to dev@commons.apache.org as a bug."</span>);</span><br><span class="line">           &#125;</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           removeLRUEntry = removeLRU(reuse);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="keyword">if</span> (removeLRUEntry) &#123;</span><br><span class="line">           <span class="keyword">if</span> (reuse == <span class="keyword">null</span>) &#123;</span><br><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">                   <span class="string">"reuse=null, header.after="</span> + header.after + <span class="string">" header.before"</span> + header.before +</span><br><span class="line">                   <span class="string">" key="</span> + <span class="built_in">key</span> + <span class="string">" value="</span> + value + <span class="string">" size="</span> + <span class="built_in">size</span> + <span class="string">" maxSize="</span> + maxSize +</span><br><span class="line">                   <span class="string">" Please check that your keys are immutable, and that you have used synchronization properly."</span> +</span><br><span class="line">                   <span class="string">" If so, then please report this to dev@commons.apache.org as a bug."</span>);</span><br><span class="line">           &#125;</span><br><span class="line">           reuseMapping(reuse, hashIndex, hashCode, <span class="built_in">key</span>, value);</span><br><span class="line">       &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">           <span class="keyword">super</span>.addMapping(hashIndex, hashCode, <span class="built_in">key</span>, value);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">       <span class="comment">// 缓存节点数未超过最大值</span></span><br><span class="line">       <span class="keyword">super</span>.addMapping(hashIndex, hashCode, <span class="built_in">key</span>, value);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="built_in">boolean</span> isFull() &#123;</span><br><span class="line">   <span class="keyword">return</span> <span class="built_in">size</span> &gt;= maxSize;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// super.addMapping</span></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> addMapping(<span class="keyword">final</span> <span class="built_in">int</span> hashIndex, <span class="keyword">final</span> <span class="built_in">int</span> hashCode, <span class="keyword">final</span> K <span class="built_in">key</span>, <span class="keyword">final</span> V value) &#123;</span><br><span class="line">   modCount++;</span><br><span class="line">   <span class="keyword">final</span> HashEntry&lt;K, V&gt; entry = createEntry(data[hashIndex], hashCode, <span class="built_in">key</span>, value);</span><br><span class="line">   addEntry(entry, hashIndex);</span><br><span class="line">   <span class="built_in">size</span>++;</span><br><span class="line">   checkCapacity();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> reuseMapping(<span class="keyword">final</span> LinkEntry&lt;K, V&gt; entry, <span class="keyword">final</span> <span class="built_in">int</span> hashIndex, <span class="keyword">final</span> <span class="built_in">int</span> hashCode,</span><br><span class="line">                                <span class="keyword">final</span> K <span class="built_in">key</span>, <span class="keyword">final</span> V value) &#123;</span><br><span class="line">   <span class="comment">// find the entry before the entry specified in the hash table</span></span><br><span class="line">   <span class="comment">// remember that the parameters (except the first) refer to the new entry,</span></span><br><span class="line">   <span class="comment">// not the old one</span></span><br><span class="line">   <span class="keyword">try</span> &#123;</span><br><span class="line">       <span class="keyword">final</span> <span class="built_in">int</span> removeIndex = hashIndex(entry.hashCode, data.length);</span><br><span class="line">       <span class="keyword">final</span> HashEntry&lt;K, V&gt;[] tmp = data;  <span class="comment">// may protect against some sync issues</span></span><br><span class="line">       HashEntry&lt;K, V&gt; <span class="built_in">loop</span> = tmp[removeIndex];</span><br><span class="line">       HashEntry&lt;K, V&gt; previous = <span class="keyword">null</span>;</span><br><span class="line">       <span class="comment">// 找到链表最后的元素</span></span><br><span class="line">       <span class="keyword">while</span> (<span class="built_in">loop</span> != entry &amp;&amp; <span class="built_in">loop</span> != <span class="keyword">null</span>) &#123;</span><br><span class="line">           previous = <span class="built_in">loop</span>;</span><br><span class="line">           <span class="built_in">loop</span> = <span class="built_in">loop</span>.next;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">if</span> (<span class="built_in">loop</span> == <span class="keyword">null</span>) &#123;</span><br><span class="line">           <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">               <span class="string">"Entry.next=null, data[removeIndex]="</span> + data[removeIndex] + <span class="string">" previous="</span> + previous +</span><br><span class="line">               <span class="string">" key="</span> + <span class="built_in">key</span> + <span class="string">" value="</span> + value + <span class="string">" size="</span> + <span class="built_in">size</span> + <span class="string">" maxSize="</span> + maxSize +</span><br><span class="line">               <span class="string">" Please check that your keys are immutable, and that you have used synchronization properly."</span> +</span><br><span class="line">               <span class="string">" If so, then please report this to dev@commons.apache.org as a bug."</span>);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// reuse the entry</span></span><br><span class="line">       modCount++;</span><br><span class="line">       removeEntry(entry, removeIndex, previous);</span><br><span class="line">       reuseEntry(entry, hashIndex, hashCode, <span class="built_in">key</span>, value);</span><br><span class="line">       addEntry(entry, hashIndex);</span><br><span class="line">   &#125; <span class="keyword">catch</span> (<span class="keyword">final</span> NullPointerException ex) &#123;</span><br><span class="line">       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(</span><br><span class="line">               <span class="string">"NPE, entry="</span> + entry + <span class="string">" entryIsHeader="</span> + (entry==header) +</span><br><span class="line">               <span class="string">" key="</span> + <span class="built_in">key</span> + <span class="string">" value="</span> + value + <span class="string">" size="</span> + <span class="built_in">size</span> + <span class="string">" maxSize="</span> + maxSize +</span><br><span class="line">               <span class="string">" Please check that your keys are immutable, and that you have used synchronization properly."</span> +</span><br><span class="line">               <span class="string">" If so, then please report this to dev@commons.apache.org as a bug."</span>);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">    </span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> removeEntry(<span class="keyword">final</span> HashEntry&lt;K, V&gt; entry, <span class="keyword">final</span> <span class="built_in">int</span> hashIndex, <span class="keyword">final</span> HashEntry&lt;K, V&gt; previous) &#123;</span><br><span class="line">   <span class="keyword">final</span> LinkEntry&lt;K, V&gt; link = (LinkEntry&lt;K, V&gt;) entry;</span><br><span class="line">   link.before.after = link.after;</span><br><span class="line">   link.after.before = link.before;</span><br><span class="line">   link.after = <span class="keyword">null</span>;</span><br><span class="line">   link.before = <span class="keyword">null</span>;</span><br><span class="line">   <span class="keyword">super</span>.removeEntry(entry, hashIndex, previous);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> reuseEntry(<span class="keyword">final</span> HashEntry&lt;K, V&gt; entry, <span class="keyword">final</span> <span class="built_in">int</span> hashIndex, <span class="keyword">final</span> <span class="built_in">int</span> hashCode,</span><br><span class="line">                         <span class="keyword">final</span> K <span class="built_in">key</span>, <span class="keyword">final</span> V value) &#123;</span><br><span class="line">   entry.next = data[hashIndex];</span><br><span class="line">   entry.hashCode = hashCode;</span><br><span class="line">   entry.<span class="built_in">key</span> = <span class="built_in">key</span>;</span><br><span class="line">   entry.value = value;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> addEntry(<span class="keyword">final</span> HashEntry&lt;K, V&gt; entry, <span class="keyword">final</span> <span class="built_in">int</span> hashIndex) &#123;</span><br><span class="line">   <span class="keyword">final</span> LinkEntry&lt;K, V&gt; link = (LinkEntry&lt;K, V&gt;) entry;</span><br><span class="line">   link.after  = header;</span><br><span class="line">   link.before = header.before;</span><br><span class="line">   header.before.after = link;</span><br><span class="line">   header.before = link;</span><br><span class="line">   data[hashIndex] = link;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先判断isFull()，节点数量是否超过最大值：</p>
+<ul>
+<li>当前的节点数量未超过最大值：创建当前节点，加入链表尾部，size ++ ,检查是否需求扩容</li>
+<li>当前的节点数量大于等于最大值：执行核心的reuseMapping方法</li>
+<li>定位到对应的链表，执行removeEntry，reuseEntry，addEntry</li>
+</ul>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
 	<div class="article-tag tagcloud">
 		<i class="icon-price-tags icon"></i>
 		<ul class="article-tag-list">
@@ -170,57 +196,122 @@
 		</ul>
 	</div>
 
-          
+      
 
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
         </div>
-        <div class="clearfix"></div>
-    </header>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/05/22/lrumap/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
   </div>
 </article>
+
   
-    
-    
-    <article class="archive-article archive-type-pages">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      	<div class="article-meta">
-	      	<a href="/blog/2018/05/11/codeRecord/" class="archive-article-date">
-  	<time datetime="2018-05-11T11:31:40.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-05-11</time>
-</a>
+<nav id="article-nav">
+  
+  
+    <a href="/blog/2018/05/11/codeRecord/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Code 小记</div>
+      <i class="icon-circle-right"></i>
+    </a>
+  
+</nav>
+
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
         </div>
-    	 
+        
+        
+    </div>
+</aside>
+
+
+
   
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/blog/2018/05/11/codeRecord/">Code 小记</a>
-    </h1>
+  
   
 
-        <div class="article-info info-on-right">
-          
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">Code 小记</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-          
-
-        </div>
-        <div class="clearfix"></div>
-    </header>
-  </div>
-</article>
-  
-  
-    </div></section>
   
 
-    
+  
+
+  
+  <div id="gitment-ctn"></div> 
+<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">
+<script src="https://imsun.github.io/gitment/dist/gitment.browser.js"></script>
+<script>
+var gitment = new Gitment({
+  id: '{{page.articleID}}',
+  owner: 'peanuts0',
+  repo: 'blog',
+  oauth: {
+    client_id: '17716911d1143cda96e6',
+    client_secret: '9be9112ba195381de296db28a6eda05903c65d16',
+  },
+})
+gitment.render('gitment-ctn')
+</script>
+  
 
 
           </div>
@@ -243,8 +334,8 @@
 	var yiliaConfig = {
 		mathjax: false,
 		isHome: false,
-		isPost: false,
-		isArchive: true,
+		isPost: true,
+		isArchive: false,
 		isTag: false,
 		isCategory: false,
 		open_in_new: false,
