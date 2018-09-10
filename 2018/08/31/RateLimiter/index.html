@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>spring解决bean循环依赖 | 花生的博客</title>
+  <title>RateLimiter初使用 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="问题1234567A &amp;#123;    private B b;&amp;#125;B &amp;#123;    private A a;&amp;#125; 在类A初始化时发现B还未初始化，先去初始化B，然而当B初始化时发现要先初始化A，这样就陷入死循环了，spring ioc是如何解决这个问题的呢？">
-<meta name="keywords" content="Spring">
+  <meta name="description" content="限流小解 中讲解了两种限流方法：令牌桶，漏桶，在代码层面可以用Guava中的RateLimiter实现。 RateLimiter针对令牌桶RateLimit有两种对应的实现：平滑预热限流(SmoothWarmingUp)和平滑突发限流(SmoothBursty)">
+<meta name="keywords" content="后端，linux，java，spring，分布式，python">
 <meta property="og:type" content="article">
-<meta property="og:title" content="spring解决bean循环依赖">
-<meta property="og:url" content="//peanuts0.github.io/2018/03/14/interview/index.html">
+<meta property="og:title" content="RateLimiter初使用">
+<meta property="og:url" content="//peanuts0.github.io/2018/08/31/RateLimiter/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="问题1234567A &amp;#123;    private B b;&amp;#125;B &amp;#123;    private A a;&amp;#125; 在类A初始化时发现B还未初始化，先去初始化B，然而当B初始化时发现要先初始化A，这样就陷入死循环了，spring ioc是如何解决这个问题的呢？">
-<meta property="og:updated_time" content="2018-03-14T03:46:20.000Z">
+<meta property="og:description" content="限流小解 中讲解了两种限流方法：令牌桶，漏桶，在代码层面可以用Guava中的RateLimiter实现。 RateLimiter针对令牌桶RateLimit有两种对应的实现：平滑预热限流(SmoothWarmingUp)和平滑突发限流(SmoothBursty)">
+<meta property="og:updated_time" content="2018-09-10T04:05:07.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="spring解决bean循环依赖">
-<meta name="twitter:description" content="问题1234567A &amp;#123;    private B b;&amp;#125;B &amp;#123;    private A a;&amp;#125; 在类A初始化时发现B还未初始化，先去初始化B，然而当B初始化时发现要先初始化A，这样就陷入死循环了，spring ioc是如何解决这个问题的呢？">
+<meta name="twitter:title" content="RateLimiter初使用">
+<meta name="twitter:description" content="限流小解 中讲解了两种限流方法：令牌桶，漏桶，在代码层面可以用Guava中的RateLimiter实现。 RateLimiter针对令牌桶RateLimit有两种对应的实现：平滑预热限流(SmoothWarmingUp)和平滑突发限流(SmoothBursty)">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -130,48 +130,112 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="pages-interview" class="article article-type-pages " itemscope itemprop="blogPost">
+            <article id="pages-RateLimiter" class="article article-type-pages " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      spring解决bean循环依赖
+      RateLimiter初使用
     </h1>
   
 
         
-        <a href="/blog/2018/03/14/interview/" class="archive-article-date">
-  	<time datetime="2018-03-14T01:48:00.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-14</time>
+        <a href="/blog/2018/08/31/RateLimiter/" class="archive-article-date">
+  	<time datetime="2018-08-31T08:08:16.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-08-31</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="问题"><a href="#问题" class="headerlink" title="问题"></a>问题</h2><figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">A &#123;</span><br><span class="line">    private <span class="keyword">B </span><span class="keyword">b;</span></span><br><span class="line"><span class="keyword">&#125;</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">B </span>&#123;</span><br><span class="line">    private A a<span class="comment">;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>在类A初始化时发现B还未初始化，先去初始化B，然而当B初始化时发现要先初始化A，这样就陷入死循环了，spring ioc是如何解决这个问题的呢？</p>
+        <p><a href="https://peanuts0.github.io/blog/2018/03/21/limit/" target="_blank" rel="noopener">限流小解</a> 中讲解了两种限流方法：令牌桶，漏桶，在代码层面可以用Guava中的RateLimiter实现。</p>
+<h2 id="RateLimiter"><a href="#RateLimiter" class="headerlink" title="RateLimiter"></a>RateLimiter</h2><p>针对令牌桶RateLimit有两种对应的实现：平滑预热限流(SmoothWarmingUp)和平滑突发限流(SmoothBursty)</p>
 <a id="more"></a>
-<h2 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h2><h4 id="构造器循环依赖"><a href="#构造器循环依赖" class="headerlink" title="构造器循环依赖"></a>构造器循环依赖</h4><p>比如</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">B</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> A a;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">B</span><span class="params">(A a)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.a = a;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> B b;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">A</span><span class="params">(B b)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.b = b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>项目启动时将会出错：</p>
-<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">nested exception is org.springframework.beans.factory.<span class="string">BeanCurrentlyInCreationException:</span> Error creating bean with name <span class="string">'a'</span>: </span><br><span class="line">Requested bean is currently <span class="keyword">in</span> <span class="string">creation:</span> Is there an unresolvable circular reference?</span><br><span class="line"></span><br><span class="line">***************************</span><br><span class="line">APPLICATION FAILED TO START</span><br><span class="line">***************************</span><br><span class="line"></span><br><span class="line">Description:</span><br><span class="line"></span><br><span class="line">The dependencies of some of the beans <span class="keyword">in</span> the application context form a <span class="string">cycle:</span></span><br><span class="line"></span><br><span class="line">┌─────┐</span><br><span class="line">|  a defined <span class="keyword">in</span> file [<span class="regexp">/Users/</span>peanuthuang<span class="regexp">/Documents/</span>code<span class="regexp">/peanut/</span>demo<span class="regexp">/build/</span>classes<span class="regexp">/main/</span>com<span class="regexp">/peanut/</span>spring<span class="regexp">/ioc/</span>circular/A.<span class="keyword">class</span>]</span><br><span class="line">↑     ↓</span><br><span class="line">|  b defined <span class="keyword">in</span> file [<span class="regexp">/Users/</span>peanuthuang<span class="regexp">/Documents/</span>code<span class="regexp">/peanut/</span>demo<span class="regexp">/build/</span>classes<span class="regexp">/main/</span>com<span class="regexp">/peanut/</span>spring<span class="regexp">/ioc/</span>circular/B.<span class="keyword">class</span>]</span><br><span class="line">└─────┘</span><br></pre></td></tr></table></figure>
-<p><strong>这种构造函数的循环依赖，spring是没办法解决的</strong>！</p>
-<h4 id="Autowired循环依赖-singleton"><a href="#Autowired循环依赖-singleton" class="headerlink" title="@Autowired循环依赖(singleton)"></a>@Autowired循环依赖(singleton)</h4><p>比如</p>
-<figure class="highlight less"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">@Service</span></span><br><span class="line">public class A &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="variable">@Autowired</span></span><br><span class="line">    private B a;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">@Service</span></span><br><span class="line">public class B &#123;</span><br><span class="line"></span><br><span class="line">    <span class="variable">@Autowired</span></span><br><span class="line">    private A a;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这种注入是ok的。 那么为什么呢？</p>
-<p>构造函数方式的注入不能成功是因为我们通常是这样创建类实例的 A a = new A()，在构造函数执行过程中发生了循环依赖，没办法处理。而上述的@Autowired方式的注入则是对属性的设置，也就是说先执行了构造函数的初始化，此时并不依赖任何其他实例，然后再对private属性进行设置。也就是类似下面的过程：</p>
-<figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">A a = new A()<span class="comment">;</span></span><br><span class="line"><span class="keyword">B </span><span class="keyword">b </span>= new <span class="keyword">B();</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="keyword">a.setB(b);</span></span><br><span class="line"><span class="keyword">b.setA(a);</span></span><br></pre></td></tr></table></figure>
-<p>那么spring 是怎么实现的呢？ 我们来看看spring的原码</p>
-<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="keyword">Object</span> doCreateBean(<span class="keyword">final</span> <span class="keyword">String</span> beanName, <span class="keyword">final</span> RootBeanDefinition mbd, <span class="keyword">final</span> <span class="keyword">Object</span>[] args)</span><br><span class="line">			<span class="keyword">throws</span> BeanCreationException &#123;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 1、Instantiate the bean.(实例化bean)</span></span><br><span class="line">		BeanWrapper instanceWrapper = <span class="keyword">null</span>;</span><br><span class="line">		<span class="keyword">if</span> (mbd.isSingleton()) &#123;</span><br><span class="line">			instanceWrapper = <span class="keyword">this</span>.factoryBeanInstanceCache.remove(beanName);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">if</span> (instanceWrapper == <span class="keyword">null</span>) &#123;</span><br><span class="line">			instanceWrapper = createBeanInstance(beanName, mbd, args);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">final</span> <span class="keyword">Object</span> bean = (instanceWrapper != <span class="keyword">null</span> ? instanceWrapper.getWrappedInstance() : <span class="keyword">null</span>);</span><br><span class="line">		Class&lt;?&gt; beanType = (instanceWrapper != <span class="keyword">null</span> ? instanceWrapper.getWrappedClass() : <span class="keyword">null</span>);</span><br><span class="line">		mbd.resolvedTargetType = beanType;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Allow post-processors to modify the merged bean definition.</span></span><br><span class="line">		<span class="keyword">synchronized</span> (mbd.postProcessingLock) &#123;</span><br><span class="line">			<span class="keyword">if</span> (!mbd.postProcessed) &#123;</span><br><span class="line">				<span class="keyword">try</span> &#123;</span><br><span class="line">					applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">					<span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(mbd.getResourceDescription(), beanName,</span><br><span class="line">							<span class="string">"Post-processing of merged bean definition failed"</span>, ex);</span><br><span class="line">				&#125;</span><br><span class="line">				mbd.postProcessed = <span class="keyword">true</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 2、单例循环依赖处理 </span></span><br><span class="line">		<span class="comment">// Eagerly cache singletons to be able to resolve circular references</span></span><br><span class="line">		<span class="comment">// even when triggered by lifecycle interfaces like BeanFactoryAware.</span></span><br><span class="line">		<span class="built_in">boolean</span> earlySingletonExposure = (mbd.isSingleton() &amp;&amp; <span class="keyword">this</span>.allowCircularReferences &amp;&amp;</span><br><span class="line">				isSingletonCurrentlyInCreation(beanName));</span><br><span class="line">		<span class="keyword">if</span> (earlySingletonExposure) &#123;</span><br><span class="line">			<span class="keyword">if</span> (logger.isDebugEnabled()) &#123;</span><br><span class="line">				logger.debug(<span class="string">"Eagerly caching bean '"</span> + beanName +</span><br><span class="line">						<span class="string">"' to allow for resolving potential circular references"</span>);</span><br><span class="line">			&#125;</span><br><span class="line">			addSingletonFactory(beanName, <span class="keyword">new</span> ObjectFactory&lt;<span class="keyword">Object</span>&gt;() &#123;</span><br><span class="line">				@Override</span><br><span class="line">				<span class="keyword">public</span> <span class="keyword">Object</span> getObject() <span class="keyword">throws</span> BeansException &#123;</span><br><span class="line">					<span class="keyword">return</span> getEarlyBeanReference(beanName, mbd, bean);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// 3、初始化bean 属性Initialize the bean instance.</span></span><br><span class="line">		<span class="keyword">Object</span> exposedObject = bean;</span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			populateBean(beanName, mbd, instanceWrapper);</span><br><span class="line">			<span class="keyword">if</span> (exposedObject != <span class="keyword">null</span>) &#123;</span><br><span class="line">				exposedObject = initializeBean(beanName, exposedObject, mbd);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">			<span class="keyword">if</span> (ex <span class="keyword">instanceof</span> BeanCreationException &amp;&amp; beanName.equals(((BeanCreationException) ex).getBeanName())) &#123;</span><br><span class="line">				<span class="keyword">throw</span> (BeanCreationException) ex;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="keyword">else</span> &#123;</span><br><span class="line">				<span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(</span><br><span class="line">						mbd.getResourceDescription(), beanName, <span class="string">"Initialization of bean failed"</span>, ex);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (earlySingletonExposure) &#123;</span><br><span class="line">			<span class="keyword">Object</span> earlySingletonReference = getSingleton(beanName, <span class="keyword">false</span>);</span><br><span class="line">			<span class="keyword">if</span> (earlySingletonReference != <span class="keyword">null</span>) &#123;</span><br><span class="line">				<span class="keyword">if</span> (exposedObject == bean) &#123;</span><br><span class="line">					exposedObject = earlySingletonReference;</span><br><span class="line">				&#125;</span><br><span class="line">				<span class="keyword">else</span> <span class="keyword">if</span> (!<span class="keyword">this</span>.allowRawInjectionDespiteWrapping &amp;&amp; hasDependentBean(beanName)) &#123;</span><br><span class="line">					<span class="keyword">String</span>[] dependentBeans = getDependentBeans(beanName);</span><br><span class="line">					Set&lt;<span class="keyword">String</span>&gt; actualDependentBeans = <span class="keyword">new</span> LinkedHashSet&lt;<span class="keyword">String</span>&gt;(dependentBeans.length);</span><br><span class="line">					<span class="keyword">for</span> (<span class="keyword">String</span> dependentBean : dependentBeans) &#123;</span><br><span class="line">						<span class="keyword">if</span> (!removeSingletonIfCreatedForTypeCheckOnly(dependentBean)) &#123;</span><br><span class="line">							actualDependentBeans.<span class="built_in">add</span>(dependentBean);</span><br><span class="line">						&#125;</span><br><span class="line">					&#125;</span><br><span class="line">					<span class="keyword">if</span> (!actualDependentBeans.isEmpty()) &#123;</span><br><span class="line">						<span class="keyword">throw</span> <span class="keyword">new</span> BeanCurrentlyInCreationException(beanName,</span><br><span class="line">								<span class="string">"Bean with name '"</span> + beanName + <span class="string">"' has been injected into other beans ["</span> +</span><br><span class="line">								StringUtils.collectionToCommaDelimitedString(actualDependentBeans) +</span><br><span class="line">								<span class="string">"] in its raw version as part of a circular reference, but has eventually been "</span> +</span><br><span class="line">								<span class="string">"wrapped. This means that said other beans do not use the final version of the "</span> +</span><br><span class="line">								<span class="string">"bean. This is often the result of over-eager type matching - consider using "</span> +</span><br><span class="line">								<span class="string">"'getBeanNamesOfType' with the 'allowEagerInit' flag turned off, for example."</span>);</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Register bean as disposable.</span></span><br><span class="line">		<span class="keyword">try</span> &#123;</span><br><span class="line">			registerDisposableBeanIfNecessary(beanName, bean, mbd);</span><br><span class="line">		&#125;</span><br><span class="line">		<span class="keyword">catch</span> (BeanDefinitionValidationException ex) &#123;</span><br><span class="line">			<span class="keyword">throw</span> <span class="keyword">new</span> BeanCreationException(</span><br><span class="line">					mbd.getResourceDescription(), beanName, <span class="string">"Invalid destruction signature"</span>, ex);</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">return</span> exposedObject;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">protected</span> <span class="keyword">void</span> addSingletonFactory(<span class="keyword">String</span> beanName, ObjectFactory&lt;?&gt; singletonFactory) &#123;</span><br><span class="line">		Assert.notNull(singletonFactory, <span class="string">"Singleton factory must not be null"</span>);</span><br><span class="line">		<span class="keyword">synchronized</span> (<span class="keyword">this</span>.singletonObjects) &#123;</span><br><span class="line">			<span class="keyword">if</span> (!<span class="keyword">this</span>.singletonObjects.containsKey(beanName)) &#123;</span><br><span class="line">				<span class="keyword">this</span>.singletonFactories.put(beanName, singletonFactory);</span><br><span class="line">				<span class="keyword">this</span>.earlySingletonObjects.remove(beanName);</span><br><span class="line">				<span class="keyword">this</span>.registeredSingletons.<span class="built_in">add</span>(beanName);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
-<p>从上述代码分析可知：</p>
+<h3 id="SmoothBursty"><a href="#SmoothBursty" class="headerlink" title="SmoothBursty"></a>SmoothBursty</h3><p>SmoothBursty 令牌桶算法实现的是平滑突发限流，也是RateLimiter的默认实现：<br><code>RateLimiter.create(2)</code></p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">public static RateLimiter create(double permitsPerSecond) &#123;</span><br><span class="line">    /*</span><br><span class="line">     * The default RateLimiter configuration can save <span class="keyword">the</span> unused permits <span class="keyword">of</span> up <span class="keyword">to</span> one <span class="keyword">second</span>.</span><br><span class="line">     * This <span class="keyword">is</span> <span class="keyword">to</span> avoid unnecessary stalls <span class="keyword">in</span> situations like this: A RateLimiter <span class="keyword">of</span> <span class="number">1</span>qps,</span><br><span class="line">     * <span class="keyword">and</span> <span class="number">4</span> threads, all calling acquire() <span class="keyword">at</span> these moments:</span><br><span class="line">     *</span><br><span class="line">     * T0 <span class="keyword">at</span> <span class="number">0</span> seconds</span><br><span class="line">     * T1 <span class="keyword">at</span> <span class="number">1.05</span> seconds</span><br><span class="line">     * T2 <span class="keyword">at</span> <span class="number">2</span> seconds</span><br><span class="line">     * T3 <span class="keyword">at</span> <span class="number">3</span> seconds</span><br><span class="line">     *</span><br><span class="line">     * Due <span class="keyword">to</span> <span class="keyword">the</span> slight <span class="built_in">delay</span> <span class="keyword">of</span> T1, T2 would have <span class="keyword">to</span> sleep till <span class="number">2.05</span> seconds,</span><br><span class="line">     * <span class="keyword">and</span> T3 would also have <span class="keyword">to</span> sleep till <span class="number">3.05</span> seconds.</span><br><span class="line">     */</span><br><span class="line"><span class="built_in">    return</span> create(SleepingStopwatch.createFromSystemTimer(), permitsPerSecond);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">static RateLimiter create(SleepingStopwatch stopwatch, double permitsPerSecond) &#123;</span><br><span class="line">    RateLimiter rateLimiter = new SmoothBursty(stopwatch, <span class="number">1.0</span> /* maxBurstSeconds */);</span><br><span class="line">    rateLimiter.setRate(permitsPerSecond);</span><br><span class="line"><span class="built_in">    return</span> rateLimiter;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>我们看一下例子：</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> RateLimiter rateLimiter = RateLimiter.create(<span class="number">5</span>);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> main(<span class="keyword">String</span>[] args) <span class="keyword">throws</span> InterruptedException &#123;</span><br><span class="line">		System.out.<span class="built_in">println</span>(rateLimiter.acquire());</span><br><span class="line">		System.out.<span class="built_in">println</span>(rateLimiter.acquire());</span><br><span class="line">		System.out.<span class="built_in">println</span>(rateLimiter.acquire());</span><br><span class="line">		System.out.<span class="built_in">println</span>(rateLimiter.acquire());</span><br><span class="line">		System.out.<span class="built_in">println</span>(rateLimiter.acquire());</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+<p>输出：<br>&gt;<br>0.0<br>0.189705<br>0.198555<br>0.195691<br>0.195649</p>
+<p><code>acquire()</code> 方法返回的是获取令牌消耗的时间，<code>RateLimiter.create(5)</code> 表示每秒创建5个令牌，也就是说200ms产生一个令牌。如上述例子所示，5个突发的请求，被均摊成每200ms获取一次令牌。</p>
+<p>再看一个例子：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">RateLimiterDemo</span> &#123;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> RateLimiter rateLimiter = RateLimiter.create(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span>(<span class="params">String[] args</span>) </span>&#123;</span><br><span class="line">		System.<span class="keyword">out</span>.println(rateLimiter.acquire(<span class="number">2</span>));</span><br><span class="line">		System.<span class="keyword">out</span>.println(rateLimiter.acquire(<span class="number">4</span>));</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<p>&gt;<br>0.0<br>0.995853</p>
+<p>`` rateLimiter.acquire(2) <figure class="highlight plain"><figcaption><span>`` 0.0` 的意思是请求2个令牌耗时 ` 0.0` 秒，后续 `` rateLimiter.acquire(4) `` 请求4个令牌耗时近1秒时间。这里有个问题：明明 `` RateLimiter.create(2) ``创建的是1秒只能产生2个令牌，一次请求4个令牌为什么花费的时间也只是1秒呢？</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">&lt;!-- more --&gt;</span><br><span class="line">再看一个例子 ：</span><br></pre></td></tr></table></figure></p>
+<p>public class RateLimiterDemo {</p>
+<pre><code>private static RateLimiter rateLimiter = RateLimiter.create(2);
+
+public static void main(String[] args) throws InterruptedException {
+    System.out.println(rateLimiter.acquire(2));
+    System.out.println(rateLimiter.acquire(4));
+    System.out.println(rateLimiter.acquire(2));
+    System.out.println(rateLimiter.acquire(2));
+}
+</code></pre><p>}<br><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">输出：</span><br><span class="line">&gt;</span><br><span class="line"><span class="number">0.0</span></span><br><span class="line"><span class="number">0.996458</span></span><br><span class="line"><span class="number">1.993191</span></span><br><span class="line"><span class="number">0.996503</span></span><br><span class="line"></span><br><span class="line">后面两次 ``rateLimiter.acquire(<span class="number">2</span>)`` 的耗时不一样，第一次要<span class="number">2</span>秒，第二<span class="number">1</span>秒。**原来RateLimiter 允许拿走超出剩余令牌数，只不过把锅甩给了下一次拿的人。**`` rateLimiter.acquire(<span class="number">4</span>) `` 请求<span class="number">4</span>个令牌时也还是耗时<span class="number">1</span>秒，当下一个请求<span class="number">2</span>个令牌时，要补前人的坑（坑了两个令牌，耗时<span class="number">1</span>秒）。</span><br><span class="line"></span><br><span class="line">类似ReentrantLock中的 ``tryLock(long timeout, TimeUnit unit)``，RateLimiter除了acquire()请求方法外也还有``rateLimiter.tryAcquire(<span class="number">1</span>,TimeUnit.SECONDS);`` 返回true / false， 表示在特定时间内尝试获取令牌。</span><br><span class="line"></span><br><span class="line">现比如我们有个业务方法要做限流，一秒内只能允许一个线程访问执行：</span><br></pre></td></tr></table></figure></p>
+<p>public class RateLimiterDemo {</p>
+<pre><code>private static RateLimiter rateLimiter = RateLimiter.create(1);
+
+public static void main(String[] args) throws InterruptedException {
+    Thread one = new Thread(RateLimiterDemo::handle);
+    Thread two = new Thread(RateLimiterDemo::handle);
+    Thread three = new Thread(RateLimiterDemo::handle);
+    Thread four = new Thread(RateLimiterDemo::handle);
+
+    one.start();
+    two.start();
+    three.start();
+    four.start();
+}
+
+
+private static void handle(){
+    rateLimiter.acquire();
+    String result = &quot;thread= &quot; + Thread.currentThread().getName();
+    result +=  &quot; time=&quot; + LocalDateTime.now();
+    System.out.println(result);
+
+    //do something
+}
+</code></pre><p>}<br><figure class="highlight subunit"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">输出：</span><br><span class="line">&gt;</span><br><span class="line">thread= Thread<span class="string">-0</span> time=2018<span class="string">-08</span><span class="string">-31</span>T18:30:32.265</span><br><span class="line">thread= Thread<span class="string">-3</span> time=2018<span class="string">-08</span><span class="string">-31</span>T18:30:33.118</span><br><span class="line">thread= Thread<span class="string">-2</span> time=2018<span class="string">-08</span><span class="string">-31</span>T18:30:34.120</span><br><span class="line">thread= Thread<span class="string">-1</span> time=2018<span class="string">-08</span><span class="string">-31</span>T18:30:35.121</span><br><span class="line"></span><br><span class="line">handle一秒内只有一个线程访问</span><br><span class="line">### SmoothWarmingUp</span><br><span class="line"></span><br><span class="line">相比SmoothBursty允许一定的突发流量，SmoothWarmingUp实现的是平滑预热型的限流。</span><br><span class="line">`` create(double permitsPerSecond, long warmupPeriod, TimeUnit unit) ``</span><br><span class="line"></span><br><span class="line">permitsPerSecond ：每秒的令牌数量</span><br><span class="line">warmupPeriod：预热时间</span><br></pre></td></tr></table></figure></p>
+<p>/**</p>
 <ul>
-<li>spring 首先会进行1处的bean构造函数初始化<code>createBeanInstance</code></li>
-<li>然后进行2处，对bean判断是否是单例，有没有禁用循环依赖等，然后再对已初始化构造函数的该bean 进行缓存<code>addSingletonFactory</code> </li>
-<li>然后进行3处的 <code>populateBean</code> 对bean属性进行设置</li>
+<li>This implements the following function where coldInterval = coldFactor <em> stableInterval.
+</em></li>
+<li>^ throttling</li>
+<li>|</li>
+<li>cold  +                  /</li>
+<li>interval |                 /.</li>
+<li>|                / .</li>
+<li>|               /  .   &lt;– “warmup period” is the area of the trapezoid between</li>
+<li>|              /   .       thresholdPermits and maxPermits</li>
+<li>|             /    .</li>
+<li>|            /     .</li>
+<li>|           /      .</li>
+<li>stable +———-/  WARM .</li>
+<li>interval |          .   UP  .</li>
+<li>|          . PERIOD.</li>
+<li>|          .       .</li>
+<li>0 +———-+——-+————–&gt; storedPermits</li>
+<li>*/       <figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">在冷启动期间（<span class="keyword">cold</span> interval），获取令牌的时间是较长的，经过warn up period的时间后，达到 stable interval时，获取令牌的时间就驱于稳定了。</span><br><span class="line"></span><br><span class="line">我们看个例子</span><br></pre></td></tr></table></figure>
+</li>
 </ul>
-<p>注： spring 具体如何运行缓存解决依赖可以阅读<a href="https://www.jianshu.com/p/6c359768b1dc" target="_blank" rel="noopener">这篇博客</a> </p>
+<p>private static RateLimiter rateLimiter = RateLimiter.create(5, 1, TimeUnit.SECONDS);</p>
+<pre><code>public static void main(String[] args) throws InterruptedException {
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+    System.out.println(rateLimiter.acquire());
+
+}
+</code></pre><p>```<br>输出：<br>&gt;<br>0.0<br>0.516315<br>0.334974<br>0.218243<br>0.197186<br>0.196664<br>0.194302<br>0.195478<br>0.19719<br>0.197667</p>
 
       
 
@@ -180,17 +244,6 @@
     <div class="article-info article-info-index">
       
       
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">Spring</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
       
 
       
@@ -241,7 +294,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/03/14/interview/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/08/31/RateLimiter/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -255,18 +308,9 @@
   
 <nav id="article-nav">
   
-    <a href="/blog/2018/03/21/threadlocalmap/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          ThreadLocal
-        
-      </div>
-    </a>
   
-  
-    <a href="/blog/2018/02/22/redis-aof/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">redis 持久化之AOF</div>
+    <a href="/blog/2018/06/11/InheritableThreadLocal/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">InheritableThreadLocal 初识</div>
       <i class="icon-circle-right"></i>
     </a>
   
