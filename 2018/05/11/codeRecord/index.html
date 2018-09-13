@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="花生的博客">
 <meta property="og:description" content="个人学习笔记">
 <meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/record.jpg">
-<meta property="og:updated_time" content="2018-09-10T02:33:52.000Z">
+<meta property="og:updated_time" content="2018-09-13T09:49:58.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Code 小记">
 <meta name="twitter:description" content="个人学习笔记">
@@ -154,6 +154,18 @@
       
         <p>个人学习笔记<br><img src="http://p33uh193a.bkt.clouddn.com/record.jpg" alt=""></p>
 <a id="more"></a>
+<h3 id="FastJson-1-2-29-JSON-toJSONString-00-00-00-处理问题"><a href="#FastJson-1-2-29-JSON-toJSONString-00-00-00-处理问题" class="headerlink" title="FastJson 1.2.29 :JSON.toJSONString 00:00:00 处理问题"></a>FastJson 1.2.29 :JSON.toJSONString 00:00:00 处理问题</h3><p>fastJson 序列化时间，比如obj中有个时间参数，时间值为：2018-09-13 00:00:00。现要将时间存入es(es时间格式utc)</p>
+<figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> SerializeConfig <span class="built_in">config</span> = <span class="keyword">new</span> SerializeConfig();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">// 序列化驼峰转下转线</span></span><br><span class="line">        <span class="built_in">config</span>.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"> <span class="comment">// 序列化</span></span><br><span class="line"> OrderSnapshotDoc doc = <span class="keyword">new</span> OrderSnapshotDoc();</span><br><span class="line"> doc.setGmtModified(DateUtils.getSecondDate(<span class="string">"2018-09-13 00:00:00"</span>));</span><br><span class="line"> <span class="keyword">String</span> docJSON = JSON.toJSONString(doc, <span class="built_in">config</span>, SerializerFeature.UseISO8601DateFormat);</span><br><span class="line"> System.out.<span class="built_in">println</span>(docJSON);</span><br></pre></td></tr></table></figure>
+<p>输出结果为 </p>
+<blockquote>
+<p>{“gmt_modified”:”2018-09-13+08:00”}</p>
+</blockquote>
+<p>发现把 00:00:00 截断了，无法存入es。可以用以下代码解决：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">String</span> docJSON = <span class="built_in">JSON</span>.toJSONString(snapshotDoc, config, <span class="literal">null</span>, <span class="string">"yyyy-MM-dd'T'HH:mm:ss.SSS'+08:00'"</span>, <span class="number">3089</span>, SerializerFeature.UseISO8601DateFormat);</span><br></pre></td></tr></table></figure>
+<p>输出结果为 </p>
+<blockquote>
+<p>{“gmt_modified”:”2018-09-13T00:00:00.000+08:00”}</p>
+</blockquote>
 <h3 id="禁止System-gc-代码生效"><a href="#禁止System-gc-代码生效" class="headerlink" title="禁止System.gc()代码生效"></a>禁止System.gc()代码生效</h3><p>System.gc() 告诉jvm，应用程序希望进行一次垃圾回收，具体执行视jvm状态决定</p>
 <figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="selector-tag">-XX</span><span class="selector-pseudo">:+DisableExplicitGC</span></span><br></pre></td></tr></table></figure>
 <h3 id="es-带鉴权的dsl操作"><a href="#es-带鉴权的dsl操作" class="headerlink" title="es 带鉴权的dsl操作"></a>es 带鉴权的dsl操作</h3><figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl --user [your-admin]:[your-password] <span class="link">http://</span>[<span class="string">your-node-name</span>]:[your-port]/[your-index]/<span class="emphasis">_count?pretty=true</span></span><br></pre></td></tr></table></figure>
@@ -410,15 +422,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">工具</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">命令</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -434,15 +450,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Guava</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
               </li>
              
               <li class="article-tag-list-item">
