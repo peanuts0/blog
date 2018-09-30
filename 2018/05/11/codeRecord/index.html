@@ -16,7 +16,7 @@
 <meta property="og:site_name" content="花生的博客">
 <meta property="og:description" content="个人学习笔记">
 <meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/record.jpg">
-<meta property="og:updated_time" content="2018-09-13T09:49:58.000Z">
+<meta property="og:updated_time" content="2018-09-30T08:20:38.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Code 小记">
 <meta name="twitter:description" content="个人学习笔记">
@@ -154,6 +154,18 @@
       
         <p>个人学习笔记<br><img src="http://p33uh193a.bkt.clouddn.com/record.jpg" alt=""></p>
 <a id="more"></a>
+<h3 id="ES-From-Size-分页问题"><a href="#ES-From-Size-分页问题" class="headerlink" title="ES From Size 分页问题"></a>ES From Size 分页问题</h3><p>按照一般的查询流程来说，如果我想查询前10条数据：</p>
+<ul>
+<li>客户端请求发给某个节点</li>
+<li>节点转发给个个分片，查询每个分片上的前10条</li>
+<li>结果返回给节点，整合数据，提取前10条</li>
+<li>返回给请求客户端</li>
+</ul>
+<p>如果此时有深夜分页，查询5000页的数据，各个分片要查询的前5000页排序的数据，返回给协调节点，然后抛弃多余的数据，反回10条。</p>
+<p>es默认情况下from，size的数据查询窗口是10000条。比如说某月订单有2W，每页20条，总共有1K页。窗口大小是1W条，也就是说只能查询到500页，500页之后超过了1W条的限制就无法查询了。可以修改参数解决这个问题</p>
+<figure class="highlight xquery"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">PUT tuia_baiqi_order_snapshot/_settings</span><br><span class="line">&#123;</span><br><span class="line">    <span class="string">"index"</span>: &#123;</span><br><span class="line">        <span class="string">"max_result_window"</span>: <span class="string">"1000000"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>tuia_baiqi_order_snapshot为index名称，设置窗口大小为100W。</p>
+<p><strong>不过对于深度分页，官方推荐还是使用scroll来解决</strong></p>
 <h3 id="FastJson-1-2-29-JSON-toJSONString-00-00-00-处理问题"><a href="#FastJson-1-2-29-JSON-toJSONString-00-00-00-处理问题" class="headerlink" title="FastJson 1.2.29 :JSON.toJSONString 00:00:00 处理问题"></a>FastJson 1.2.29 :JSON.toJSONString 00:00:00 处理问题</h3><p>fastJson 序列化时间，比如obj中有个时间参数，时间值为：2018-09-13 00:00:00。现要将时间存入es(es时间格式utc)</p>
 <figure class="highlight arduino"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> SerializeConfig <span class="built_in">config</span> = <span class="keyword">new</span> SerializeConfig();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        <span class="comment">// 序列化驼峰转下转线</span></span><br><span class="line">        <span class="built_in">config</span>.propertyNamingStrategy = PropertyNamingStrategy.SnakeCase;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line"> <span class="comment">// 序列化</span></span><br><span class="line"> OrderSnapshotDoc doc = <span class="keyword">new</span> OrderSnapshotDoc();</span><br><span class="line"> doc.setGmtModified(DateUtils.getSecondDate(<span class="string">"2018-09-13 00:00:00"</span>));</span><br><span class="line"> <span class="keyword">String</span> docJSON = JSON.toJSONString(doc, <span class="built_in">config</span>, SerializerFeature.UseISO8601DateFormat);</span><br><span class="line"> System.out.<span class="built_in">println</span>(docJSON);</span><br></pre></td></tr></table></figure>
 <p>输出结果为 </p>
@@ -176,7 +188,9 @@
 <figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line">public <span class="class"><span class="keyword">class</span> <span class="title">WebMvcConfig</span> <span class="keyword">extends</span> <span class="title">WebMvcConfigurerAdapter</span> </span>&#123;</span><br><span class="line">   </span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    public void configureMessageConverters(<span class="type">List</span>&lt;<span class="type">HttpMessageConverter</span>&lt;?&gt;&gt; converters) &#123;</span><br><span class="line">    </span><br><span class="line">       <span class="type">MappingJackson2HttpMessageConverter</span> jackson2HttpMessageConverter = <span class="keyword">new</span> <span class="type">MappingJackson2HttpMessageConverter</span>();</span><br><span class="line">    </span><br><span class="line">       <span class="type">ObjectMapper</span> objectMapper = <span class="keyword">new</span> <span class="type">ObjectMapper</span>();</span><br><span class="line">    </span><br><span class="line">       <span class="comment">/**</span></span><br><span class="line"><span class="comment">        * 序列换成json时,将所有的long变成string</span></span><br><span class="line"><span class="comment">        * 因为js中得数字类型不能包含所有的java long值</span></span><br><span class="line"><span class="comment">        */</span></span><br><span class="line">    </span><br><span class="line">       <span class="type">SimpleModule</span> simpleModule = <span class="keyword">new</span> <span class="type">SimpleModule</span>();</span><br><span class="line">       simpleModule.addSerializer(<span class="type">Float</span>.<span class="keyword">class</span>, <span class="type">ToStringSerializer</span>.instance);</span><br><span class="line">       simpleModule.addSerializer(<span class="type">Long</span>.<span class="keyword">class</span>, <span class="type">ToStringSerializer</span>.instance);</span><br><span class="line">       simpleModule.addSerializer(<span class="type">Double</span>.<span class="keyword">class</span>, <span class="type">ToStringSerializer</span>.instance);</span><br><span class="line">       objectMapper.registerModule(simpleModule);</span><br><span class="line">    </span><br><span class="line">       jackson2HttpMessageConverter.setObjectMapper(objectMapper);</span><br><span class="line">       converters.add(jackson2HttpMessageConverter);</span><br><span class="line">    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>方案二：单个处理<br>在对应的属性上添加 @JsonSerialize(using = ToStringSerializer.class) 注解；</p>
 <figure class="highlight kotlin"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@JsonSerialize(using = ToStringSerializer.class)</span></span><br><span class="line"><span class="keyword">private</span> <span class="built_in">Long</span>  stockId;</span><br></pre></td></tr></table></figure>
-<h3 id="idea控制台打印sql日志"><a href="#idea控制台打印sql日志" class="headerlink" title="idea控制台打印sql日志"></a>idea控制台打印sql日志</h3><p>在logback.xml文件中添加mapper接口包的level为debug即可</p>
+<h3 id="idea控制台打印sql日志"><a href="#idea控制台打印sql日志" class="headerlink" title="idea控制台打印sql日志"></a>idea控制台打印sql日志</h3><p>mybatis configuration配置全局的日志输出</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;setting <span class="attribute">name</span>=<span class="string">"logImpl"</span> <span class="attribute">value</span>=<span class="string">"STDOUT_LOGGING"</span> /&gt;</span><br></pre></td></tr></table></figure>
+<p>或者将上述注释，在logback.xml文件中添加mapper接口包的level为debug即可</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;logger <span class="attribute">name</span>=<span class="string">"com.qiho.center.common.daoh.qiho"</span> <span class="attribute">level</span>=<span class="string">"DEBUG"</span> /&gt;</span><br></pre></td></tr></table></figure>
 <h3 id="gradle-commandLine-传入环境标识"><a href="#gradle-commandLine-传入环境标识" class="headerlink" title="gradle commandLine 传入环境标识"></a>gradle commandLine 传入环境标识</h3><p>gradle当前环境传入对应的.sh脚本执行，例：</p>
 <p>gradle clean build -x test -Penv=test </p>
@@ -434,15 +448,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color5">Java</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
+                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -450,11 +460,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
+                <a href="javascript:void(0)" class="js-tag color4">多线程</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Guava</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
               </li>
              
               <li class="article-tag-list-item">
