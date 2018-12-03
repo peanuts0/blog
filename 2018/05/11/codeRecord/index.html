@@ -15,12 +15,10 @@
 <meta property="og:url" content="//peanuts0.github.io/2018/05/11/codeRecord/index.html">
 <meta property="og:site_name" content="花生的博客">
 <meta property="og:description" content="个人学习笔记">
-<meta property="og:image" content="http://p33uh193a.bkt.clouddn.com/record.jpg">
-<meta property="og:updated_time" content="2018-09-30T08:20:38.000Z">
+<meta property="og:updated_time" content="2018-12-03T14:38:13.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Code 小记">
 <meta name="twitter:description" content="个人学习笔记">
-<meta name="twitter:image" content="http://p33uh193a.bkt.clouddn.com/record.jpg">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -152,8 +150,22 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>个人学习笔记<br><img src="http://p33uh193a.bkt.clouddn.com/record.jpg" alt=""></p>
+        <p>个人学习笔记</p>
 <a id="more"></a>
+<h3 id="telnet-连接redis"><a href="#telnet-连接redis" class="headerlink" title="telnet 连接redis"></a>telnet 连接redis</h3><p>除了使用redis-cli连接redis server 外，我们还可以使用telnet连接</p>
+<ul>
+<li>telnet host port</li>
+<li>auth password</li>
+</ul>
+<p>示例：</p>
+<ul>
+<li>telnet r-xxx.redis.rds.aliyuncs.com 6379 </li>
+<li>auth xxx</li>
+</ul>
+<h3 id="Redis-RDB分析"><a href="#Redis-RDB分析" class="headerlink" title="Redis RDB分析"></a>Redis RDB分析</h3><p>可以使用rdbtools来分析redisr的rdb备份文件，先bgsave生成rdb文件，再转化成csv，利用csv文件排序分析。</p>
+<ul>
+<li>pip安装：<figure class="highlight plain"><figcaption><span>install rdbtools ```</span></figcaption><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">* 执行命令将rdb文件导成csv文件：</span><br><span class="line">``` rdb -c memory dump.rdb &gt; memory.csv</span><br></pre></td></tr></table></figure></li>
+</ul>
 <h3 id="ES-From-Size-分页问题"><a href="#ES-From-Size-分页问题" class="headerlink" title="ES From Size 分页问题"></a>ES From Size 分页问题</h3><p>按照一般的查询流程来说，如果我想查询前10条数据：</p>
 <ul>
 <li>客户端请求发给某个节点</li>
@@ -436,11 +448,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">命令</a>
+                <a href="javascript:void(0)" class="js-tag color5">Java</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -448,11 +456,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Java</a>
+                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
+                <a href="javascript:void(0)" class="js-tag color1">Linux</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">命令</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -468,19 +480,19 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">架构</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Redis</a>
+                <a href="javascript:void(0)" class="js-tag color2">Spring</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color1">Redis</a>
               </li>
             
             <div class="clearfix"></div>
