@@ -15,7 +15,7 @@
 <meta property="og:url" content="//peanuts0.github.io/2018/05/11/codeRecord/index.html">
 <meta property="og:site_name" content="花生的博客">
 <meta property="og:description" content="个人学习笔记">
-<meta property="og:updated_time" content="2019-03-11T10:54:30.000Z">
+<meta property="og:updated_time" content="2019-07-05T03:57:35.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Code 小记">
 <meta name="twitter:description" content="个人学习笔记">
@@ -152,6 +152,15 @@
       
         <p>个人学习笔记</p>
 <a id="more"></a>
+<h3 id="查看网络连接"><a href="#查看网络连接" class="headerlink" title="查看网络连接"></a>查看网络连接</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">netstat</span>  查网络连接</span><br></pre></td></tr></table></figure>
+<p>-a : 查看所有连接 ：<code>netstat -a</code><br>-at: 查看所有tcp连接 ：<code>netstat -at</code><br>-p: 带端口：<code>netstat -atp</code> </p>
+<p><code>netstat -atp | grep TIME_WAIT</code> </p>
+<h3 id="Java-应用启动参数"><a href="#Java-应用启动参数" class="headerlink" title="Java 应用启动参数"></a>Java 应用启动参数</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">java -server -Xmx10g -Xms10g -Xmn512m -<span class="string">XX:</span>-OmitStackTraceInFastThrow -<span class="string">XX:</span>MetaspaceSize=<span class="number">256</span>m -<span class="string">XX:</span>MaxMetaspaceSize=<span class="number">512</span>m -Xss256k -<span class="string">XX:</span>+Expli</span><br><span class="line">citGCInvokesConcurrent -<span class="string">XX:</span>+UseConcMarkSweepGC -<span class="string">XX:</span>+UseCMSInitiatingOccupancyOnly -<span class="string">XX:</span>ParallelGCThreads=<span class="number">8</span> -<span class="string">XX:</span>CMSInitiatingOccupancyFraction=<span class="number">70</span> -<span class="string">XX:</span>-UseBiasedLocking -<span class="string">XX:</span>AutoBoxCacheMax</span><br><span class="line">=<span class="number">20000</span> -<span class="string">XX:</span>MaxTenuringThreshold=<span class="number">6</span> -<span class="string">Xloggc:</span><span class="regexp">/dev/</span>shm/gc.log -<span class="string">XX:</span>+PrintGCApplicationStoppedTime -<span class="string">XX:</span>+PrintGCDateStamps -<span class="string">XX:</span>+PrintGCDetails -<span class="string">XX:</span>+PrintCodeCache -<span class="string">XX:</span>+UseGCLogFileRotation -XX</span><br><span class="line">:NumberOfGCLogFiles=<span class="number">2</span> -<span class="string">XX:</span>GCLogFileSize=<span class="number">10</span>m -<span class="string">XX:</span>+HeapDumpOnOutOfMemoryError -<span class="string">XX:</span>HeapDumpPath=<span class="regexp">/root/</span>logs<span class="regexp">/ -XX:MaxDirectMemorySize=2G -jar /</span>root<span class="regexp">/duiba-deploy/</span>tuia-engine.jar --spring.prof</span><br><span class="line">iles.active=prodvpc --spring.cloud.config.uri=<span class="string">http:</span><span class="comment">//configserver.duiba.com.cn</span></span><br></pre></td></tr></table></figure>
+<h3 id="Hbase-节点问题"><a href="#Hbase-节点问题" class="headerlink" title="Hbase 节点问题"></a>Hbase 节点问题</h3><p>问题：</p>
+<figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The node /hbase is <span class="keyword">not</span> <span class="keyword">in</span> ZooKeeper. It should have been written <span class="keyword">by</span> <span class="keyword">the</span> master. Check <span class="keyword">the</span> <span class="built_in">value</span> configured <span class="keyword">in</span> <span class="string">'zookeeper.znode.parent'</span>. There could be <span class="keyword">a</span> mismatch <span class="keyword">with</span> <span class="keyword">the</span> <span class="literal">one</span> configured <span class="keyword">in</span> <span class="keyword">the</span> master</span><br></pre></td></tr></table></figure>
+<p>解决：<br>zk节点中没有 /hbase节点，启动zk <code>zkServer start</code>, 登陆 zkCli，创建节点：<code>create /hbase myhbase</code></p>
+<p>hbase shell 再次登陆，如果遇到 <code>Can&#39;t get master address from ZooKeeper; znode data == null</code>问题，可以尝试重启hbase 看下</p>
+<p><code>stop-hbase.sh</code><br><code>start-hbase.sh</code></p>
 <h3 id="获取文件contentType"><a href="#获取文件contentType" class="headerlink" title="获取文件contentType"></a>获取文件contentType</h3><p>支持本地与http</p>
 <figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">String</span> contentType = <span class="keyword">new</span> <span class="type">MimetypesFileTypeMap</span>().getContentType(<span class="keyword">new</span> <span class="type">File</span>(filePath))</span><br></pre></td></tr></table></figure>
 <h3 id="XX-OmitStackTraceInFastThrow"><a href="#XX-OmitStackTraceInFastThrow" class="headerlink" title="-XX:-OmitStackTraceInFastThrow"></a>-XX:-OmitStackTraceInFastThrow</h3><p>OmitStackTraceInFastThrow， jdk 1.6开始，默认server模式下开启了这个参数，意为当jvm检测到程序在重复抛一个异常，在执行若干次后会将异常吞掉，这里的若干次在jdk1.7测得是20707。即执行20707次后，stackTrace 长度会为0。有时这不利于我们排错，通过指定OmitStackTraceInFastThrow，可禁用这功能。</p>
@@ -483,11 +492,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
+                <a href="javascript:void(0)" class="js-tag color1">Redis</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color1">Redis</a>
+                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
               </li>
              
               <li class="article-tag-list-item">
