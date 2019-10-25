@@ -131,6 +131,81 @@
           <div id="js-content" class="content-ll">
             
   
+    <article id="pages-annotationProxy" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/blog/2019/08/14/annotationProxy/">同类多个方法注解不生效</a>
+    </h1>
+  
+
+        
+        <a href="/blog/2019/08/14/annotationProxy/" class="archive-article-date">
+  	<time datetime="2019-08-14T09:29:19.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>看一个例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">T</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transaction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">a</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        b();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transaction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">b</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// </span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">JAVA</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+        <p class="article-more-link">
+          <a class="article-more-a" href="/blog/2019/08/14/annotationProxy/">展开全文 >></a>
+        </p>
+      
+
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+<aside class="wrap-side-operation">
+    <div class="mod-side-operation">
+        
+        <div class="jump-container" id="js-jump-container" style="display:none;">
+            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
+                <i class="icon-font icon-back"></i>
+            </a>
+            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
+                <i class="icon-font icon-plane jump-plane"></i>
+            </div>
+        </div>
+        
+        
+    </div>
+</aside>
+
+
+
+
+  
     <article id="pages-RateLimiter" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
   <div class="article-inner">
     
@@ -393,6 +468,9 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>个人学习笔记</p>
+<h3 id="记-mysql-deadLock"><a href="#记-mysql-deadLock" class="headerlink" title="记 mysql deadLock"></a>记 mysql deadLock</h3><p>例如有表<code>user(id pk, name index, age)</code> id主键索引，name 普通索引。<br>此时有个sql: update set name=’lishi’ where name = ‘wangwu’，在高并发下该语句可能发生死锁。<br>首先mysql innodb引擎索引有聚簇索引（主键索引）与普通索引。聚簇索引B+树叶子节点存储主键值与整行的数据，普通索引叶子节点存储的是该列值与主键值。当通过聚簇索引查询时能够直接获取整行数据，所以查询很快; 当通过普通索引查询时，会先找到叶子节点中的主键值，再通过主键值在聚簇索引中查询整行数据，所以普通索引查询是扫了两次的索引树。<br>回到上述的更新语句，首先通过name索引查询wangwu的记录主键id, 再通过聚簇索引找到id值的数据行，然后再更新聚簇索引上的行数据与普通索引树name索引中的值，这里要更新两个索引树中的内容。</p>
+<p>查询：name索引树 –&gt; id索引树<br>更新：id索引树 –&gt; name 索引树</p>
+<p>mysql的事务隔离级别是通过索引加锁实现，在高并发下查询与更新的锁可能存在冲突的情况。为了避免这种情况发生，尽量用聚簇索引的更新，比如：update set name=’lishi’ where id = 1</p>
         
           <a class="article-more-a" href="/blog/2018/05/11/codeRecord/#more">more >></a>
         
@@ -681,83 +759,6 @@
 
 
   
-    <article id="pages-limit" class="article article-type-pages  article-index" itemscope itemprop="blogPost">
-  <div class="article-inner">
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/blog/2018/03/21/limit/">限流小解</a>
-    </h1>
-  
-
-        
-        <a href="/blog/2018/03/21/limit/" class="archive-article-date">
-  	<time datetime="2018-03-21T13:03:58.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-03-21</time>
-</a>
-        
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p><img src="http://image.woshipm.com/wp-files/2014/09/%E5%8D%9A%E5%AE%A2%E6%B5%81%E9%87%8F5%E5%A6%99%E6%8B%9B.jpg" alt=""></p>
-<h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>在高并发系统下有三把利器用来保护系统：缓存，降级，限流。缓存的目的是提升系统的响应速度和增大系统处理容量，降级是当部分服务出现问题影响核心功能时，需要将其暂时屏蔽掉，待高峰过后或问题解决后再打开，而有些类似秒杀，抢购等场景并不能用缓存和降级来解决，需要有一种手段来控制有限的请求量或者并发数，那就是限流。</p>
-        
-          <a class="article-more-a" href="/blog/2018/03/21/limit/#more">more >></a>
-        
-      
-
-      
-    </div>
-    <div class="article-info article-info-index">
-      
-      
-	<div class="article-tag tagcloud">
-		<i class="icon-price-tags icon"></i>
-		<ul class="article-tag-list">
-			 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">架构</a>
-        		</li>
-      		
-		</ul>
-	</div>
-
-      
-
-      
-        <p class="article-more-link">
-          <a class="article-more-a" href="/blog/2018/03/21/limit/">展开全文 >></a>
-        </p>
-      
-
-      
-      <div class="clearfix"></div>
-    </div>
-  </div>
-</article>
-
-<aside class="wrap-side-operation">
-    <div class="mod-side-operation">
-        
-        <div class="jump-container" id="js-jump-container" style="display:none;">
-            <a href="javascript:void(0)" class="mod-side-operation__jump-to-top">
-                <i class="icon-font icon-back"></i>
-            </a>
-            <div id="js-jump-plan-container" class="jump-plan-container" style="top: -11px;">
-                <i class="icon-font icon-plane jump-plane"></i>
-            </div>
-        </div>
-        
-        
-    </div>
-</aside>
-
-
-
-
-  
   
     <nav id="page-nav">
       <span class="page-number current">1</span><a class="page-number" href="/blog/page/2/">2</a><a class="page-number" href="/blog/page/3/">3</a><a class="extend next" rel="next" href="/blog/page/2/">Next &raquo;</a>
@@ -847,6 +848,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
@@ -855,7 +860,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+                <a href="javascript:void(0)" class="js-tag color5">JAVA</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -864,10 +869,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JAVA</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -883,15 +884,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Guava</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
               </li>
             
             <div class="clearfix"></div>

@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="//peanuts0.github.io">
   <title>Code 小记 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="个人学习笔记">
+  <meta name="description" content="个人学习笔记 记 mysql deadLock例如有表user(id pk, name index, age) id主键索引，name 普通索引。此时有个sql: update set name=’lishi’ where name = ‘wangwu’，在高并发下该语句可能发生死锁。首先mysql innodb引擎索引有聚簇索引（主键索引）与普通索引。聚簇索引B+树叶子节点存储主键值与整行的数据">
 <meta name="keywords" content="Code 小记">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Code 小记">
 <meta property="og:url" content="//peanuts0.github.io/2018/05/11/codeRecord/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="个人学习笔记">
-<meta property="og:updated_time" content="2019-07-05T03:57:35.000Z">
+<meta property="og:description" content="个人学习笔记 记 mysql deadLock例如有表user(id pk, name index, age) id主键索引，name 普通索引。此时有个sql: update set name=’lishi’ where name = ‘wangwu’，在高并发下该语句可能发生死锁。首先mysql innodb引擎索引有聚簇索引（主键索引）与普通索引。聚簇索引B+树叶子节点存储主键值与整行的数据">
+<meta property="og:updated_time" content="2019-10-25T09:15:04.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Code 小记">
-<meta name="twitter:description" content="个人学习笔记">
+<meta name="twitter:description" content="个人学习笔记 记 mysql deadLock例如有表user(id pk, name index, age) id主键索引，name 普通索引。此时有个sql: update set name=’lishi’ where name = ‘wangwu’，在高并发下该语句可能发生死锁。首先mysql innodb引擎索引有聚簇索引（主键索引）与普通索引。聚簇索引B+树叶子节点存储主键值与整行的数据">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -151,11 +151,15 @@
     <div class="article-entry" itemprop="articleBody">
       
         <p>个人学习笔记</p>
+<h3 id="记-mysql-deadLock"><a href="#记-mysql-deadLock" class="headerlink" title="记 mysql deadLock"></a>记 mysql deadLock</h3><p>例如有表<code>user(id pk, name index, age)</code> id主键索引，name 普通索引。<br>此时有个sql: update set name=’lishi’ where name = ‘wangwu’，在高并发下该语句可能发生死锁。<br>首先mysql innodb引擎索引有聚簇索引（主键索引）与普通索引。聚簇索引B+树叶子节点存储主键值与整行的数据，普通索引叶子节点存储的是该列值与主键值。当通过聚簇索引查询时能够直接获取整行数据，所以查询很快; 当通过普通索引查询时，会先找到叶子节点中的主键值，再通过主键值在聚簇索引中查询整行数据，所以普通索引查询是扫了两次的索引树。<br>回到上述的更新语句，首先通过name索引查询wangwu的记录主键id, 再通过聚簇索引找到id值的数据行，然后再更新聚簇索引上的行数据与普通索引树name索引中的值，这里要更新两个索引树中的内容。</p>
+<p>查询：name索引树 –&gt; id索引树<br>更新：id索引树 –&gt; name 索引树</p>
+<p>mysql的事务隔离级别是通过索引加锁实现，在高并发下查询与更新的锁可能存在冲突的情况。为了避免这种情况发生，尽量用聚簇索引的更新，比如：update set name=’lishi’ where id = 1</p>
 <a id="more"></a>
+<h3 id="RedisTemplate-increment-异常"><a href="#RedisTemplate-increment-异常" class="headerlink" title="RedisTemplate increment 异常"></a>RedisTemplate increment 异常</h3><p>spring自带的 RedisTemplate 无法使用increment, 会报错 <code>ERR value is not an integer or out of range</code>，原因是 RedisTemplate 使用的是jdk自带的序列化方式JdkSerializationRedisSerializer， 该序列化方式除了本身的数值外还有一些类，版本号等信息，不是纯数字，所以无法直接increment。 可以用StringRedisTemplate，该template使用的是string的序列化方式， string.getBytes(charset) 直接取char数组</p>
 <h3 id="查看网络连接"><a href="#查看网络连接" class="headerlink" title="查看网络连接"></a>查看网络连接</h3><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">netstat</span>  查网络连接</span><br></pre></td></tr></table></figure>
 <p>-a : 查看所有连接 ：<code>netstat -a</code><br>-at: 查看所有tcp连接 ：<code>netstat -at</code><br>-p: 带端口：<code>netstat -atp</code> </p>
 <p><code>netstat -atp | grep TIME_WAIT</code> </p>
-<h3 id="Java-应用启动参数"><a href="#Java-应用启动参数" class="headerlink" title="Java 应用启动参数"></a>Java 应用启动参数</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">java -server -Xmx10g -Xms10g -Xmn512m -<span class="string">XX:</span>-OmitStackTraceInFastThrow -<span class="string">XX:</span>MetaspaceSize=<span class="number">256</span>m -<span class="string">XX:</span>MaxMetaspaceSize=<span class="number">512</span>m -Xss256k -<span class="string">XX:</span>+Expli</span><br><span class="line">citGCInvokesConcurrent -<span class="string">XX:</span>+UseConcMarkSweepGC -<span class="string">XX:</span>+UseCMSInitiatingOccupancyOnly -<span class="string">XX:</span>ParallelGCThreads=<span class="number">8</span> -<span class="string">XX:</span>CMSInitiatingOccupancyFraction=<span class="number">70</span> -<span class="string">XX:</span>-UseBiasedLocking -<span class="string">XX:</span>AutoBoxCacheMax</span><br><span class="line">=<span class="number">20000</span> -<span class="string">XX:</span>MaxTenuringThreshold=<span class="number">6</span> -<span class="string">Xloggc:</span><span class="regexp">/dev/</span>shm/gc.log -<span class="string">XX:</span>+PrintGCApplicationStoppedTime -<span class="string">XX:</span>+PrintGCDateStamps -<span class="string">XX:</span>+PrintGCDetails -<span class="string">XX:</span>+PrintCodeCache -<span class="string">XX:</span>+UseGCLogFileRotation -XX</span><br><span class="line">:NumberOfGCLogFiles=<span class="number">2</span> -<span class="string">XX:</span>GCLogFileSize=<span class="number">10</span>m -<span class="string">XX:</span>+HeapDumpOnOutOfMemoryError -<span class="string">XX:</span>HeapDumpPath=<span class="regexp">/root/</span>logs<span class="regexp">/ -XX:MaxDirectMemorySize=2G -jar /</span>root<span class="regexp">/duiba-deploy/</span>tuia-engine.jar --spring.prof</span><br><span class="line">iles.active=prodvpc --spring.cloud.config.uri=<span class="string">http:</span><span class="comment">//configserver.duiba.com.cn</span></span><br></pre></td></tr></table></figure>
+<h3 id="Java-应用启动参数"><a href="#Java-应用启动参数" class="headerlink" title="Java 应用启动参数"></a>Java 应用启动参数</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">java -server -Xmx10g -Xms10g -Xmn512m -<span class="string">XX:</span>-OmitStackTraceInFastThrow -<span class="string">XX:</span>MetaspaceSize=<span class="number">256</span>m -<span class="string">XX:</span>MaxMetaspaceSize=<span class="number">512</span>m -Xss256k -<span class="string">XX:</span>+Expli</span><br><span class="line">citGCInvokesConcurrent -<span class="string">XX:</span>+UseConcMarkSweepGC -<span class="string">XX:</span>+UseCMSInitiatingOccupancyOnly -<span class="string">XX:</span>ParallelGCThreads=<span class="number">8</span> -<span class="string">XX:</span>CMSInitiatingOccupancyFraction=<span class="number">70</span> -<span class="string">XX:</span>-UseBiasedLocking -<span class="string">XX:</span>AutoBoxCacheMax</span><br><span class="line">=<span class="number">20000</span> -<span class="string">XX:</span>MaxTenuringThreshold=<span class="number">6</span> -<span class="string">Xloggc:</span><span class="regexp">/dev/</span>shm/gc.log -<span class="string">XX:</span>+PrintGCApplicationStoppedTime -<span class="string">XX:</span>+PrintGCDateStamps -<span class="string">XX:</span>+PrintGCDetails -<span class="string">XX:</span>+PrintCodeCache -<span class="string">XX:</span>+UseGCLogFileRotation -XX</span><br><span class="line">:NumberOfGCLogFiles=<span class="number">2</span> -<span class="string">XX:</span>GCLogFileSize=<span class="number">10</span>m -<span class="string">XX:</span>+HeapDumpOnOutOfMemoryError -<span class="string">XX:</span>HeapDumpPath=<span class="regexp">/root/</span>logs<span class="regexp">/ -XX:MaxDirectMemorySize=2G -jar /</span>root<span class="regexp">/duiba-deploy/</span>tuia-engine.jar --spring.prof</span><br><span class="line">iles.active=prodvpc --spring.cloud.config.uri=<span class="string">http:</span><span class="comment">//configserver.duiba.com.cn</span></span><br><span class="line"></span><br><span class="line"> java -server -Xmx8g -Xms8g -<span class="string">XX:</span>MetaspaceSize=<span class="number">256</span>m -<span class="string">XX:</span>MaxMetaspaceSize=<span class="number">512</span>m -Xss256k -XX</span><br><span class="line">:+UseG1GC -<span class="string">XX:</span>SurvivorRatio=<span class="number">5</span> -<span class="string">XX:</span>+AlwaysPreTouch -<span class="string">XX:</span>MaxGCPauseMillis=<span class="number">100</span> -<span class="string">XX:</span>G1ReservePercent=<span class="number">25</span> -<span class="string">XX:</span>-UseLargePages -<span class="string">XX:</span>+ParallelRefProc</span><br><span class="line">Enabled -<span class="string">XX:</span>InitiatingHeapOccupancyPercent=<span class="number">30</span> -<span class="string">XX:</span>+ExplicitGCInvokesConcurrent -<span class="string">XX:</span>ParallelGCThreads=<span class="number">8</span> -<span class="string">XX:</span>-UseBiasedLocking -<span class="string">XX:</span>AutoBoxCa</span><br><span class="line">cheMax=<span class="number">20000</span> -<span class="string">XX:</span>MaxTenuringThreshold=<span class="number">6</span> -<span class="string">Xloggc:</span><span class="regexp">/dev/</span>shm/gc.log -<span class="string">XX:</span>+PrintGCApplicationStoppedTime -<span class="string">XX:</span>+PrintGCDateStamps -<span class="string">XX:</span>+PrintGCDeta</span><br><span class="line">ils -<span class="string">XX:</span>+PrintCodeCache -<span class="string">XX:</span>+UseGCLogFileRotation -<span class="string">XX:</span>NumberOfGCLogFiles=<span class="number">2</span> -<span class="string">XX:</span>GCLogFileSize=<span class="number">10</span>m -<span class="string">XX:</span>+HeapDumpOnOutOfMemoryError -<span class="string">XX:</span>HeapD</span><br><span class="line">umpPath=<span class="regexp">/root/</span>logs<span class="regexp">/ -XX:MaxDirectMemorySize=2G -jar /</span>root<span class="regexp">/duiba-deploy/</span>tuia-engine.jar --spring.profiles.active=prodvpc --spring.cloud.con</span><br><span class="line">fig.uri=<span class="string">http:</span><span class="comment">//configserver.duiba.com.cn</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">java -server -Xmx8g -Xms8g -<span class="string">XX:</span>MetaspaceSize=<span class="number">256</span>m -<span class="string">XX:</span>MaxMetaspaceSize=<span class="number">512</span>m -Xss256k -<span class="string">XX:</span>+UseG1GC -<span class="string">XX:</span>SurvivorRatio=<span class="number">5</span> -<span class="string">XX:</span>+AlwaysPreTou</span><br><span class="line">ch -<span class="string">XX:</span>MaxGCPauseMillis=<span class="number">100</span> -<span class="string">XX:</span>G1ReservePercent=<span class="number">25</span> -<span class="string">XX:</span>-UseLargePages -<span class="string">XX:</span>+ParallelRefProcEnabled -<span class="string">XX:</span>InitiatingHeapOccupancyPercent=<span class="number">30</span> -<span class="string">XX:</span>+ExplicitGCInvokesConcurrent -<span class="string">XX:</span>ParallelGCT</span><br><span class="line">hreads=<span class="number">8</span> -<span class="string">XX:</span>-UseBiasedLocking -<span class="string">XX:</span>AutoBoxCacheMax=<span class="number">20000</span> -<span class="string">XX:</span>MaxTenuringThreshold=<span class="number">6</span> -<span class="string">Xloggc:</span><span class="regexp">/dev/</span>shm/gc.log -<span class="string">XX:</span>+PrintGCApplicationStoppedTime -<span class="string">XX:</span>+PrintGCDateStamps -<span class="string">XX:</span>+PrintGCDetails</span><br><span class="line"> -<span class="string">XX:</span>+PrintCodeCache -<span class="string">XX:</span>+UseGCLogFileRotation -<span class="string">XX:</span>NumberOfGCLogFiles=<span class="number">2</span> -<span class="string">XX:</span>GCLogFileSize=<span class="number">10</span>m -<span class="string">XX:</span>+HeapDumpOnOutOfMemoryError -<span class="string">XX:</span>HeapDumpPath=<span class="regexp">/root/</span>logs/ -<span class="string">XX:</span>MaxDirectMemorySize=<span class="number">2</span>G -ja</span><br><span class="line">r <span class="regexp">/root/</span>duiba-deploy<span class="regexp">/tuia-nezha-service.jar --spring.profiles.active=prodvpc --spring.cloud.config.uri=http:/</span>/configserver.duiba.com.cn</span><br></pre></td></tr></table></figure>
 <h3 id="Hbase-节点问题"><a href="#Hbase-节点问题" class="headerlink" title="Hbase 节点问题"></a>Hbase 节点问题</h3><p>问题：</p>
 <figure class="highlight livecodeserver"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">The node /hbase is <span class="keyword">not</span> <span class="keyword">in</span> ZooKeeper. It should have been written <span class="keyword">by</span> <span class="keyword">the</span> master. Check <span class="keyword">the</span> <span class="built_in">value</span> configured <span class="keyword">in</span> <span class="string">'zookeeper.znode.parent'</span>. There could be <span class="keyword">a</span> mismatch <span class="keyword">with</span> <span class="keyword">the</span> <span class="literal">one</span> configured <span class="keyword">in</span> <span class="keyword">the</span> master</span><br></pre></td></tr></table></figure>
 <p>解决：<br>zk节点中没有 /hbase节点，启动zk <code>zkServer start</code>, 登陆 zkCli，创建节点：<code>create /hbase myhbase</code></p>
@@ -460,6 +464,10 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
           <ul class="article-tag-list" q-show="showTags">
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Linux</a>
               </li>
              
@@ -468,7 +476,7 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color3">工具</a>
+                <a href="javascript:void(0)" class="js-tag color5">JAVA</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -477,10 +485,6 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color4">多线程</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JAVA</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -496,15 +500,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
-              </li>
-             
-              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Guava</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
               </li>
             
             <div class="clearfix"></div>

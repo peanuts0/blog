@@ -6,19 +6,19 @@
   <meta name="renderer" content="webkit">
   <meta http-equiv="X-UA-Compatible" content="IE=edge" >
   <link rel="dns-prefetch" href="//peanuts0.github.io">
-  <title>guava cache refreshAfterWrite | 花生的博客</title>
+  <title>同类多个方法注解不生效 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
-<meta name="keywords" content="Java,Guava">
+  <meta name="description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125;">
+<meta name="keywords" content="JAVA">
 <meta property="og:type" content="article">
-<meta property="og:title" content="guava cache refreshAfterWrite">
-<meta property="og:url" content="//peanuts0.github.io/2018/02/01/guava-cache/index.html">
+<meta property="og:title" content="同类多个方法注解不生效">
+<meta property="og:url" content="//peanuts0.github.io/2019/08/14/annotationProxy/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
-<meta property="og:updated_time" content="2018-02-02T02:26:04.000Z">
+<meta property="og:description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125;">
+<meta property="og:updated_time" content="2019-08-16T10:37:31.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="guava cache refreshAfterWrite">
-<meta name="twitter:description" content="前言在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将">
+<meta name="twitter:title" content="同类多个方法注解不生效">
+<meta name="twitter:description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125;">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -130,65 +130,28 @@
             <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
           </div>
           <div id="js-content" class="content-ll">
-            <article id="pages-guava-cache" class="article article-type-pages " itemscope itemprop="blogPost">
+            <article id="pages-annotationProxy" class="article article-type-pages " itemscope itemprop="blogPost">
   <div class="article-inner">
     
       <header class="article-header">
         
   
     <h1 class="article-title" itemprop="name">
-      guava cache refreshAfterWrite
+      同类多个方法注解不生效
     </h1>
   
 
         
-        <a href="/blog/2018/02/01/guava-cache/" class="archive-article-date">
-  	<time datetime="2018-02-01T01:37:28.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2018-02-01</time>
+        <a href="/blog/2019/08/14/annotationProxy/" class="archive-article-date">
+  	<time datetime="2019-08-14T09:29:19.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2019-08-14</time>
 </a>
         
       </header>
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在项目运作中，为了减少RT，避免高频查询数据库都会用到缓存。guava cache属于单机内存缓存，如果你的缓存项是在分布式环境下要求提供高一致性，那么redis或者memcached这类的工具会比较适合。guava cache 和currentMap相似，不同点在于currentMap会一直持有所添加的元素，至到你显式的调用移除。而guava cache则提供了自动回收机制，在某些场景下会将缓存项回收，并且guava cache 还提供了“缓存存在，返回缓存值，否则加载缓存值并返回” 的语义来对应日常比较常见的缓存使用场景。</p>
-<h2 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h2><figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"> LoadingCache&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;  cache = CacheBuilder.<span class="keyword">new</span><span class="type">Builder</span>().maximumSize(<span class="number">100</span>)</span><br><span class="line">                                      .expireAfterWrite(<span class="number">10</span>, TimeUnit.MINUTES)</span><br><span class="line">                                      .build(<span class="keyword">new</span> <span class="type">CacheLoader</span>&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;() &#123;</span><br><span class="line">                    </span><br><span class="line">                                            @Override</span><br><span class="line">                                            <span class="keyword">public</span> <span class="keyword">String</span> load(<span class="keyword">String</span> key) throws Exception&#123;</span><br><span class="line">                                                <span class="keyword">return</span> <span class="string">"test"</span>;</span><br><span class="line">                                            &#125;</span><br><span class="line">                                      &#125;);</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line"><span class="keyword">String</span> value = cache.<span class="keyword">get</span>(<span class="string">"key"</span>);</span><br><span class="line"> <span class="comment">// cache.getUnchecked("key");</span></span><br><span class="line">&#125; <span class="keyword">catch</span> (ExecutionException e) &#123;</span><br><span class="line">  e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>上述代码<code>cache.get(&quot;key&quot;)</code> 获取缓存中的值，缓存项将在写入10分钟后过期失效，10分钟后再有请求过来将会调用 load 方法加载并返回缓存值，这足以对应日常开发的大多数场景。</p>
-<a id="more"></a>
-<h2 id="缓存失效"><a href="#缓存失效" class="headerlink" title="缓存失效"></a>缓存失效</h2><p>guava 提供了几种缓存项失效策略：</p>
-<ul>
-<li>expireAfterWrite ：缓存写入（创建或load）至一定时间后失效</li>
-<li>expireAfterAccess：缓存访问（读或者写）至一定时间后失效。读写都会重置初始时间。</li>
-<li>refreshAfterWrite：缓存写入（创建或load）至一定时间后失效，异步刷新</li>
-</ul>
-<p>对于失效的缓存项，guava cache并没有像redis或ehcache一样有个专门清除线程，guava cache清除缓存项依赖的是用户读写请求。也就是用户的读写请求在请求数据的同时也有可能在做一些数据清理工作。这样做的与另起线程相比的好处是不会有额外的线程开销，不会与用户请求线程相竞争。</p>
-<h2 id="思考"><a href="#思考" class="headerlink" title="思考"></a>思考</h2><p>cache在提高RT的同时在一定程度保证了数据库的安全，但是如果大量并发请求下当缓存失效的时候，guava cache能否有效的避免缓存穿透呢？我们来做个实验。</p>
-<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.peanut.cache;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.CacheBuilder;</span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.CacheLoader;</span><br><span class="line"><span class="keyword">import</span> com.google.common.cache.LoadingCache;</span><br><span class="line"><span class="keyword">import</span> com.google.common.util.concurrent.ThreadFactoryBuilder;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * @author peanut.huang</span></span><br><span class="line"><span class="comment"> * @date 2018/1/31.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GuavaDemo</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">static</span> LoadingCache&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;  cache;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> void main(<span class="keyword">String</span>[] args) &#123;</span><br><span class="line"></span><br><span class="line">        ThreadFactory namedThreadFactory = <span class="keyword">new</span> <span class="type">ThreadFactoryBuilder</span>().setNameFormat(<span class="string">"cache test thread %d"</span>).build();</span><br><span class="line"></span><br><span class="line">        ExecutorService executorService =  <span class="keyword">new</span> <span class="type">ThreadPoolExecutor</span>(<span class="number">10</span>,<span class="number">10</span>,</span><br><span class="line">                                                                    <span class="number">0</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">                                                                    <span class="keyword">new</span> <span class="type">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">10</span>),</span><br><span class="line">                                                                    namedThreadFactory,</span><br><span class="line">                                                                    <span class="keyword">new</span> <span class="type">ThreadPoolExecutor</span>.AbortPolicy());</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">        cache = CacheBuilder.<span class="keyword">new</span><span class="type">Builder</span>()</span><br><span class="line">                            .maximumSize(<span class="number">100</span>)</span><br><span class="line">                            .expireAfterWrite(<span class="number">1</span>, TimeUnit.SECONDS)</span><br><span class="line">                            .build(<span class="keyword">new</span> <span class="type">CacheLoader</span>&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;() &#123;</span><br><span class="line"></span><br><span class="line">                                @Override</span><br><span class="line">                                <span class="keyword">public</span> <span class="keyword">String</span> load(<span class="keyword">String</span> key) throws Exception&#123;</span><br><span class="line">                                    </span><br><span class="line">                                    <span class="comment">//加载这个k-v 要耗时2秒</span></span><br><span class="line">                                    TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">                                    System.out.println(Thread.currentThread().getName() + <span class="string">"执行了load"</span>);</span><br><span class="line">                                    <span class="keyword">return</span> System.currentTimeMillis() + <span class="string">" : value"</span>;</span><br><span class="line">                                &#125;</span><br><span class="line">                            &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//初始加载</span></span><br><span class="line">        <span class="keyword">new</span> <span class="type">Thread</span>(<span class="keyword">new</span> <span class="type">CacheThread</span>(<span class="string">"key"</span>),<span class="string">"初始化线程"</span>).start();</span><br><span class="line"></span><br><span class="line">        <span class="comment">//sleep 4 秒后缓存加载完且已失效</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            TimeUnit.SECONDS.sleep(<span class="number">4</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//10个线程去竞争</span></span><br><span class="line">        <span class="keyword">for</span>(int k = <span class="number">0</span>; k &lt; <span class="number">10</span>; k++)&#123;</span><br><span class="line">            executorService.execute(<span class="keyword">new</span> <span class="type">CacheThread</span>(<span class="string">"key"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        executorService.shutdown();</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">CacheThread</span> <span class="keyword"><span class="keyword">implements</span> <span class="type">Runnable</span></span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">String</span> key;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> CacheThread(<span class="keyword">String</span> key) &#123;</span><br><span class="line">            <span class="built_in">this</span>.key = key;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        @Override</span><br><span class="line">        <span class="keyword">public</span> void run() &#123;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">String</span> result =  cache.getUnchecked(key);</span><br><span class="line"></span><br><span class="line">            System.out.println(Thread.currentThread().getName() + <span class="string">":"</span> + result);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>这个我们用expireAfterWrite当缓存项创建一定时间后失效的策略。</p>
-<ul>
-<li>首先建一个初始线程加载k-v，加载这个k-v耗时2秒</li>
-<li>然后主线程sleep 4秒，这时加载的缓存已失效了</li>
-<li>开10个线程去竞争这个k-v资源</li>
-</ul>
-<p>输出结果：</p>
-<blockquote>
-<p>初始化线程执行了load<br>初始化线程:1517467068878 : value<br>cache test thread 0执行了load<br>cache test thread 9:1517467072872 : value<br>cache test thread 7:1517467072872 : value<br>cache test thread 6:1517467072872 : value<br>cache test thread 4:1517467072872 : value<br>cache test thread 2:1517467072872 : value<br>cache test thread 8:1517467072872 : value<br>cache test thread 1:1517467072872 : value<br>cache test thread 3:1517467072872 : value<br>cache test thread 5:1517467072872 : value<br>cache test thread 0:1517467072872 : value</p>
-</blockquote>
-<p>可以看出执行了load的线程只有初始线程和<code>cache test thread 0</code> 也就是说竞争k-v的10个线程中只有一个线程会去真正的load, 其他线程都是阻塞的,等待其中一个线程load完才回返value，所以10个线程的毫秒数都是一样的。</p>
-<p>那有没有不阻塞线程的做法呢？ 有的<code>refreshAfterWrite</code>出场了。我们把代码稍稍改一下：把 <code>expireAfterWrite</code> 换成 <code>refreshAfterWrite</code>, build 中添加reload 方法</p>
-<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">cache = CacheBuilder.newBuilder()</span><br><span class="line">                           .maximumSize(<span class="number">100</span>)</span><br><span class="line">                           .refreshAfterWrite(<span class="number">1</span>, TimeUnit.SECONDS)</span><br><span class="line">                           .build(<span class="keyword">new</span> CacheLoader&lt;<span class="keyword">String</span>, <span class="keyword">String</span>&gt;() &#123;</span><br><span class="line"></span><br><span class="line">                               @Override</span><br><span class="line">                               <span class="keyword">public</span> <span class="keyword">String</span> load(<span class="keyword">String</span> <span class="built_in">key</span>) <span class="keyword">throws</span> Exception&#123;</span><br><span class="line"></span><br><span class="line">                                   <span class="comment">//加载这个k-v 要耗时2秒</span></span><br><span class="line">                                   TimeUnit.SECONDS.sleep(<span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">                                   System.out.<span class="built_in">println</span>(Thread.currentThread().getName() + <span class="string">"执行了 load"</span>);</span><br><span class="line">                                   <span class="keyword">return</span> System.currentTimeMillis() + <span class="string">" : value"</span>;</span><br><span class="line">                               &#125;</span><br><span class="line"></span><br><span class="line">                               @Override</span><br><span class="line">                               <span class="keyword">public</span> ListenableFuture&lt;<span class="keyword">String</span>&gt; reload(<span class="keyword">String</span> <span class="built_in">key</span>, <span class="keyword">String</span> oldValue) <span class="keyword">throws</span> Exception &#123;</span><br><span class="line"></span><br><span class="line">                                   System.out.<span class="built_in">println</span>(Thread.currentThread().getName() + <span class="string">"执行了 reload"</span>);</span><br><span class="line">                                   <span class="keyword">return</span> Futures.immediateFuture(System.currentTimeMillis() + <span class="string">" : reload value"</span>);</span><br><span class="line"></span><br><span class="line">                               &#125;</span><br><span class="line">                           &#125;);</span><br></pre></td></tr></table></figure>
-<p>再看一下输出结果：</p>
-<blockquote>
-<p>初始化线程执行了 load<br>初始化线程:1517468249417 : value<br>cache test thread 0执行了 reload<br>cache test thread 1:1517468249417 : value<br>cache test thread 2:1517468249417 : value<br>cache test thread 3:1517468249417 : value<br>cache test thread 4:1517468249417 : value<br>cache test thread 5:1517468249417 : value<br>cache test thread 6:1517468249417 : value<br>cache test thread 7:1517468249417 : value<br>cache test thread 8:1517468249417 : value<br>cache test thread 9:1517468249417 : value<br>cache test thread 0:1517468251403 : reload value</p>
-</blockquote>
-<p>可以看出10个竞争的线程1-9线程都返回了旧值，只有 <code>cache test thread 0</code> 执行了reload，并返回了新的reload value。 实现了多线程竞争了只有一个线程阻塞去处理更新，其他线程返回旧值。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><ul>
-<li>refreshAfterWrite 能有效的避免大量请求下的缓存穿透，其方式是返回旧值来避免。</li>
-<li>load 或者reload 返回null，将会抛出异常</li>
-<li>guava cache的更新与淘汰策略都依赖于用户请求线程</li>
-<li>缓存的读，写，load，reload都有可能重置其 “创建时间”。<strong>但是如果是对视图的操作将不受影响。</strong></li>
-</ul>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p><a href="https://github.com/google/guava/wiki" target="_blank" rel="noopener">google guava</a></p>
-<p><a href="http://ifeve.com/google-guava-cachesexplained/" target="_blank" rel="noopener">google guava 中文翻译</a></p>
+        <p>看一个例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">T</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transaction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">a</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        b();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transaction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">b</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// </span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
       
 
@@ -202,11 +165,7 @@
 		<ul class="article-tag-list">
 			 
         		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">Java</a>
-        		</li>
-      		 
-        		<li class="article-tag-list-item">
-        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color1">Guava</a>
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color5">JAVA</a>
         		</li>
       		
 		</ul>
@@ -262,7 +221,7 @@
     <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2018/02/01/guava-cache/" alt="微信分享二维码">
+      <img src="//pan.baidu.com/share/qrcode?url=http://peanuts0.github.io/2019/08/14/annotationProxy/" alt="微信分享二维码">
     </div>
 </div>
 
@@ -276,18 +235,9 @@
   
 <nav id="article-nav">
   
-    <a href="/blog/2018/02/01/线程状态流转/" id="article-nav-newer" class="article-nav-link-wrap">
-      <i class="icon-circle-left"></i>
-      <div class="article-nav-title">
-        
-          java线程状态流转
-        
-      </div>
-    </a>
   
-  
-    <a href="/blog/2018/01/25/jsonReader/" id="article-nav-older" class="article-nav-link-wrap">
-      <div class="article-nav-title">json文件导入</div>
+    <a href="/blog/2018/08/31/RateLimiter/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">RateLimiter初使用</div>
       <i class="icon-circle-right"></i>
     </a>
   
