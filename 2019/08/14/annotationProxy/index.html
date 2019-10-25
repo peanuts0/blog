@@ -8,17 +8,17 @@
   <link rel="dns-prefetch" href="//peanuts0.github.io">
   <title>同类多个方法注解不生效 | 花生的博客</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125;">
+  <meta name="description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125; 类T的方法a()存在注解，那么spring会为">
 <meta name="keywords" content="JAVA">
 <meta property="og:type" content="article">
 <meta property="og:title" content="同类多个方法注解不生效">
 <meta property="og:url" content="//peanuts0.github.io/2019/08/14/annotationProxy/index.html">
 <meta property="og:site_name" content="花生的博客">
-<meta property="og:description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125;">
-<meta property="og:updated_time" content="2019-08-16T10:37:31.000Z">
+<meta property="og:description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125; 类T的方法a()存在注解，那么spring会为">
+<meta property="og:updated_time" content="2019-10-25T09:24:08.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="同类多个方法注解不生效">
-<meta name="twitter:description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125;">
+<meta name="twitter:description" content="看一个例子： 123456789101112public class T &amp;#123;    @Transaction    public void a() &amp;#123;        b();    &amp;#125;    @Transaction    public void b() &amp;#123;        //     &amp;#125;&amp;#125; 类T的方法a()存在注解，那么spring会为">
   
   
     <link rel="icon" href="/blog/img/favicon.png">
@@ -152,6 +152,8 @@
       
         <p>看一个例子：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">T</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transaction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">a</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        b();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Transaction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">b</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// </span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>类T的方法a()存在注解，那么spring会为类T生成一个代码类T1。在方法a()中调用b(), 其真实的调用是 this.b()，直接的调用使用的实例并不是spring 生成的代理类，所以b方法的注解不生效，要使注解生效可以使用AopContext.currentProxy()先拿到当前代理类再行调用：</p>
+<p>```<br>@Transaction<br>    public void a() {<br>    T t1 = (T) AopContext.currentProxy();<br>        t1.b();<br>    }</p>
 
       
 
@@ -383,11 +385,11 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">JAVA</a>
+                <a href="javascript:void(0)" class="js-tag color5">Java</a>
               </li>
              
               <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color5">Java</a>
+                <a href="javascript:void(0)" class="js-tag color5">JAVA</a>
               </li>
              
               <li class="article-tag-list-item">
@@ -407,15 +409,15 @@ return o(i(t),arguments.length<2?void 0:u(arguments[1]))}})},function(t,n,r){var
               </li>
              
               <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
+              </li>
+             
+              <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color3">Code 小记</a>
               </li>
              
               <li class="article-tag-list-item">
                 <a href="javascript:void(0)" class="js-tag color1">Guava</a>
-              </li>
-             
-              <li class="article-tag-list-item">
-                <a href="javascript:void(0)" class="js-tag color2">Bug备忘录</a>
               </li>
             
             <div class="clearfix"></div>
